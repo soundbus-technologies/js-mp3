@@ -21,9 +21,7 @@
     "url": "https://github.com/soundbus-technologies/js-mp3/issues"
   },
   "homepage": "https://github.com/soundbus-technologies/js-mp3#readme",
-  "dependencies": {
-    "object-sizeof": "^1.2.0"
-  },
+  "dependencies": {},
   "devDependencies": {
     "chai": "^4.1.2",
     "istanbul": "^0.4.5",
