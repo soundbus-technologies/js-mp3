@@ -10,16 +10,16 @@ var Bits = {
          * @return {number}
          */
         bits.Bit = function () {
-            if (len(bits.vec) <= bits.bytePos) {
+            if (bits.vec.byteLength <= bits.bytePos) {
                 // TODO: Should this return error?
                 return 0;
             }
-            var dv = new Uint32Array(bits.vec, bits.bytePos);
-            var tmp = dv.getUint32() >> (7 - bits.bitPos);
+            var dv = new DataView(bits.vec, bits.bytePos);
+            var tmp = (dv.getUint8(0) >>> (7 - bits.bitPos)) >>> 0;
             tmp &= 0x01;
-            bits.bytePos += (bits.bitPos + 1) >> 3;
+            bits.bytePos += ((bits.bitPos + 1) >>> 3) >>> 0;
             bits.bitPos = (bits.bitPos + 1) & 0x07;
-            return new DataView(tmp).getInt32();
+            return tmp;
         };
 
         /**
@@ -29,7 +29,7 @@ var Bits = {
             if (num === 0) {
                 return 0;
             }
-            if (bits.vec.length <= bits.bytePos) {
+            if (bits.vec.byteLength <= bits.bytePos) {
                 // TODO: Should this return error?
                 return 0;
             }
