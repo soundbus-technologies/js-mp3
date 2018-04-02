@@ -5,7 +5,8 @@
   "main": "src/index.js",
   "scripts": {
     "test": "mocha test",
-    "coverage": "istanbul cover _mocha && open ./coverage/lcov-report/index.html"
+    "coverage": "istanbul cover _mocha",
+    "coverage-report": "istanbul cover _mocha && open ./coverage/lcov-report/index.html"
   },
   "repository": {
     "type": "git",

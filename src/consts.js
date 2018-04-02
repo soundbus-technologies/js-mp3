@@ -22,7 +22,7 @@ var consts = {
     SamplingFrequency32000: 2,
     SamplingFrequencyReserved: 3,
 
-    newSamplesPerGrInstance: function (value) {
+    newSamplingFrequencyInstance: function (value) {
         var instance = {
             value: value
         };
@@ -35,7 +35,7 @@ var consts = {
                 case consts.SamplingFrequency32000:
                     return 32000;
             }
-            throw new Error('not reahed');
+            throw new Error('not reached');
         };
         return instance;
     },
