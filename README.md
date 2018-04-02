@@ -1,6 +1,6 @@
 # js-mp3
+Pure javascript mp3 decoder, WIP.  
 [![Build Status](https://travis-ci.org/soundbus-technologies/js-mp3.svg?branch=master)](https://travis-ci.org/soundbus-technologies/js-mp3)
-Pure javascript mp3 decoder, WIP.
 
 ### Tests
 #### Frameworks
