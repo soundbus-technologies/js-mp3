@@ -2,7 +2,7 @@
   "name": "js-mp3",
   "version": "0.1.0",
   "description": "Pure JS mp3 decoder.",
-  "main": "src/index.js",
+  "main": "index.js",
   "scripts": {
     "test": "mocha test",
     "coverage": "istanbul cover _mocha",
