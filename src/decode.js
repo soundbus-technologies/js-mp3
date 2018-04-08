@@ -1,3 +1,9 @@
+var Frame = require('./frame');
+var Frameheader = require('./frameheader');
+var consts = require('./consts');
+
+const invalidLength = -1;
+
 var Mp3 = {
     // Create new source object with specified ArrayBuffer
     newSource: function(buf) {
@@ -15,7 +21,13 @@ var Mp3 = {
          */
         source.seek = function (position, whence) {
             source.pos = position;
-            return source.pos
+            return source.pos;
+        };
+
+        source.readFull = function (length) {
+            var buf = new Uint8Array(source.buf, source.pos, length);
+            source.pos += buf.byteLength;
+            return buf;
         };
 
         source.skipTags = function () {
@@ -47,7 +59,46 @@ var Mp3 = {
             }
         };
 
+        source.rewind = function() {
+            source.pos = 0;
+        };
+
         return source;
+    },
+
+    newDecoder: function (buf) {
+        var s = Mp3.newSource(buf);
+
+        var decoder = {
+            source: s,
+            sampleRate: 0,
+            length: 0,
+            frame: null,
+            frameStarts: [],
+            buf: null,
+            pos: 0
+        };
+
+        decoder.readFrame = function () {
+            var result  = Frame.read(decoder.source, decoder.source.pos);
+            if (result.err) {
+                return {
+                    err: result.err
+                }
+            }
+            var pcm_buf = decoder.frame.decode();
+            decoder.buf = util.concatTypedArrays(decoder.buf, pcm_buf).buffer;
+            return {
+            }
+        };
+
+        var err = decoder.readFrame();
+        if (err) {
+            return null;
+        }
+
+        decoder.sampleRate = decoder.frame.samplingFrequency();
+        return decoder;
     }
 };
 

@@ -177,9 +177,9 @@ var Frameheader = {
          * @returns {number}
          */
         fh.frameSize = function () {
-            return (144 * Frameheader.bitrate(fh.layer(), fh.bitrateIndex()))
-                   / fh.samplingFrequency.Int()
-                   + fh.paddingBit();
+            return Math.floor((144 * Frameheader.bitrate(fh.layer(), fh.bitrateIndex()))
+                   / fh.samplingFrequency().Int()
+                   + fh.paddingBit());
         };
 
         /**
@@ -212,7 +212,7 @@ var Frameheader = {
 
     read: function (source, position) {
         var stopPosition = 4;
-        if (source.byteLength < stopPosition) {
+        if (source.buf.byteLength < stopPosition) {
             return {
                 h: 0,
                 position: 0,
@@ -220,7 +220,7 @@ var Frameheader = {
             }
         }
 
-        var buf = new Uint8Array(source, 0, stopPosition);
+        var buf = new Uint8Array(source.buf, 0, stopPosition);
         var b1 = buf[0] >>> 0;
         var b2 = buf[1] >>> 0;
         var b3 = buf[2] >>> 0;
@@ -260,6 +260,7 @@ var Frameheader = {
 
         return {
             h: fh,
+            stopPosition: stopPosition,
             position: position
         }
     }

@@ -37,7 +37,7 @@ var Bits = {
             // always end bit wise ops with >>> 0 so the result gets interpreted as unsigned.
             // don't use >>. If the left-most bit is 1 it will try to preseve the sign and thus will introduce 1's to the left. Always use >>>.
             // see https://stackoverflow.com/a/6798829
-            var tmp = (((bb.getUint8(0) << 24) >>> 0) | ((bb.getUint8(1) << 16) >>> 0) | ((bb.getUint8(2) << 8) >>> 0) | (bb.byteLength === 3 ? 0 : (bb.getUint8(3) >>> 0))) >>> 0;
+            var tmp = (((getValue(bb, 0) << 24) >>> 0) | ((getValue(bb, 1) << 16) >>> 0) | ((getValue(bb, 2) << 8) >>> 0) | (getValue(bb, 3) >>> 0)) >>> 0;
             tmp = (tmp << bits.bitPos) >>> 0;
             tmp = (tmp >>> (32 - num)) >>> 0;
             bits.bytePos += ((bits.bitPos + num) >>> 3) >>> 0;
@@ -45,11 +45,26 @@ var Bits = {
             return tmp;
         };
 
+        bits.Tail = function (offset) {
+            return new Uint8Array(bits.vec, bits.vec.byteLength - offset).buffer;
+        };
+
+        bits.LenInBytes = function () {
+            return bits.vec.byteLength;
+        };
+
         return bits;
     },
     append: function (bits, buf) {
         return Bits.createNew(bits.vec.concat(buf));
+    },
+};
+
+var getValue = function (dv, index) {
+    if (index >= dv.byteLength) {
+        return 0;
     }
+    return dv.getUint8(index);
 };
 
 module.exports = Bits;

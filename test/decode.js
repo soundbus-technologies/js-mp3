@@ -29,4 +29,20 @@ describe('mp3', function() {
             });
         });
     });
+
+    describe('#newDecoder()', function() {
+        it('should return new decoder object.', function() {
+            var decoder = Mp3.newDecoder(data.buffer());
+            should.exist(decoder, 'decoder should exist.');
+            decoder.should.be.an('object');
+        });
+
+        describe('#readFrame()', function () {
+            var decoder = Mp3.newDecoder(data.buffer());
+            var result = decoder.readFrame();
+            result.should.be.an('object');
+            should.not.exist(result.err);
+            should.exist(decoder.frame);
+        });
+    });
 });

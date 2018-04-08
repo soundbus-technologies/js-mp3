@@ -1,5 +1,3 @@
-module.exports = {
-    hello: function () {
-        console.log('hello.');
-    }
-};
+var Mp3 = require('./src/decode')
+
+module.exports = Mp3;
