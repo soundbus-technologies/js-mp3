@@ -31,9 +31,14 @@ describe('mp3', function() {
 
     describe('#newDecoder()', function() {
         it('should return new decoder object.', function() {
-            var decoder = Mp3.newDecoder(data.buffer());
+            var buf = data.buffer();
+            console.log(buf);
+
+            var decoder = Mp3.newDecoder(buf);
             should.exist(decoder, 'decoder should exist.');
             decoder.should.be.an('object');
+
+            console.log(decoder.buf);
         });
     });
 });

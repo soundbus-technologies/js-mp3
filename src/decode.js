@@ -106,7 +106,7 @@ var Mp3 = {
             }
             decoder.frame = result.f;
             var pcm_buf = decoder.frame.decode();
-            decoder.buf = util.concatBuffers(decoder.buf, pcm_buf).buffer;
+            decoder.buf = util.concatBuffers(decoder.buf, pcm_buf);
             return null;
         };
         // ======= Methods of decoder :: end =========
