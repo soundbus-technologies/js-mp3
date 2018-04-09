@@ -2,6 +2,17 @@
 Pure javascript mp3 decoder, WIP.  
 [![Build Status](https://travis-ci.org/soundbus-technologies/js-mp3.svg?branch=master)](https://travis-ci.org/soundbus-technologies/js-mp3)
 
+### Usage
+```javascript
+let Mp3 = require('js-mp3');
+
+var mp3ArrayBuffer = ...; // prepare your mp3 decoded array buffer here
+
+var decoder = Mp3.newDecoder(mp3ArrayBuffer);
+var pcmArrayBuffer = decoder.decode(); // now you got decoded PCM data
+
+```
+
 ### Tests
 #### Frameworks
 - `Mocha`: https://mochajs.org/
