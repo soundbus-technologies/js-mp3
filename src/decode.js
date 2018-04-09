@@ -24,9 +24,19 @@ var Mp3 = {
         };
 
         source.readFull = function (length) {
-            var buf = new Uint8Array(source.buf, source.pos, length);
-            source.pos += buf.byteLength;
-            return buf;
+            try {
+                var buf = new Uint8Array(source.buf, source.pos, length);
+                source.pos += buf.byteLength;
+                return {
+                    buf: buf,
+                    err: null
+                };
+            } catch (e) {
+                return {
+                    buf: null,
+                    err: e.toString()
+                }
+            }
         };
 
         source.skipTags = function () {
@@ -38,7 +48,13 @@ var Mp3 = {
             //     buf = new Uint8Array(source.buf, 0, 3);
             // }
 
-            var buf = source.readFull(3);
+            var result = source.readFull(3);
+            if (result.err) {
+                return {
+                    err: result.err
+                }
+            }
+            var buf = result.buf;
 
             // decode UTF-8
             var t = String.fromCharCode.apply(null, buf);
@@ -46,14 +62,31 @@ var Mp3 = {
                 case "TAG":
                     // TODO DELETE comment
                     // buf = new Uint8Array(source.buf, 3, Math.min(125, source.buf.byteLength));
-                    buf = source.readFull(125);
+                    result = source.readFull(125);
+                    if (result.err) {
+                        return {
+                            err: result.err
+                        }
+                    }
+                    buf = result.buf;
                     break;
                 case 'ID3':
                     // TODO DELETE comment
                     // Skip version (2 bytes) and flag (1 byte)
-                    buf = source.readFull(3);
+                    result = source.readFull(3);
+                    if (result.err) {
+                        return {
+                            err: result.err
+                        }
+                    }
 
-                    buf = source.readFull(4);
+                    result = source.readFull(4);
+                    if (result.err) {
+                        return {
+                            err: result.err
+                        }
+                    }
+                    buf = result.buf;
                     // TODO DELETE comment
                     // buf = new Uint8Array(source.buf, 6, Math.min(4, source.buf.byteLength));
                     if (buf.byteLength !== 4) {
@@ -62,7 +95,13 @@ var Mp3 = {
                         };
                     }
                     var size = (((buf[0] >>> 0) << 21) >>> 0) | (((buf[1] >>> 0) << 14) >>> 0) | (((buf[2] >>> 0) << 7) >>> 0) | (buf[3] >>> 0);
-                    buf = source.readFull(size);
+                    result = source.readFull(size);
+                    if (result.err) {
+                        return {
+                            err: result.err
+                        }
+                    }
+                    buf = result.buf;
                     // TODO DELETE comment
                     // buf = new Uint8Array(source.buf, 6 + buf.byteLength, Math.min(size, source.buf.byteLength));
                     break;
@@ -107,7 +146,18 @@ var Mp3 = {
             decoder.frame = result.f;
             var pcm_buf = decoder.frame.decode();
             decoder.buf = util.concatBuffers(decoder.buf, pcm_buf);
-            return null;
+            return {};
+        };
+
+        decoder.decode = function () {
+            var result;
+            while(true) {
+                result = decoder.readFrame();
+                if (result.err) {
+                    break;
+                }
+            }
+            return decoder.buf;
         };
         // ======= Methods of decoder :: end =========
 
@@ -116,8 +166,8 @@ var Mp3 = {
             return null;
         }
 
-        var err = decoder.readFrame();
-        if (err) {
+        var result = decoder.readFrame();
+        if (result.err) {
             return null;
         }
 

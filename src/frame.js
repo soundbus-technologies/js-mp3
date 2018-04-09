@@ -376,7 +376,7 @@ var Frame = {
                     var next_sfb = consts.SfBandIndicesSet[sfreq].S[sfb + 1] * 3;
                     var win_len = consts.SfBandIndicesSet[sfreq].S[sfb + 1] -
                                   consts.SfBandIndicesSet[sfreq].S[sfb];
-                    for (var i = 0; i < int(f.sideInfo.Count1[gr][ch]);) /* i++ done below! */ {
+                    for (var i = 0; i < frame.sideInfo.Count1[gr][ch];) /* i++ done below! */ {
                         // Check if we're into the next scalefac band
                         if (i === next_sfb) {
                             sfb++;
@@ -565,7 +565,13 @@ var Frame = {
     },
 
     readCRC: function (source) {
-        var buf = source.readFull(2);
+        var result = source.readFull(2);
+        if (result.err) {
+            return {
+                err: result.err
+            }
+        }
+        var buf = result.buf;
         if (buf.byteLength < 2) {
             return "mp3: error at readCRC";
         }

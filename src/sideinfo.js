@@ -74,7 +74,13 @@ var Sideinfo = {
             main_data_size -= 2;
         }
         // Read sideinfo from bitstream into buffer used by Bits()
-        var buf = source.readFull(sideinfo_size);
+        var result = source.readFull(sideinfo_size);
+        if (result.err) {
+            return {
+                err: result.err
+            }
+        }
+        var buf = result.buf;
         // var buf = new Uint8Array(source.buf, pos, sideinfo_size);
         if (buf.byteLength < sideinfo_size) {
             return {

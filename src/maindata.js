@@ -187,7 +187,13 @@ var read = function (source, prev, size, offset) {
         vec = prev.Tail(offset);
     }
     // Read the main_data from file
-    var buf = source.readFull(size);
+    var result = source.readFull(size);
+    if (result.err) {
+        return {
+            err: result.err
+        }
+    }
+    var buf = result.buf;
     // var buf = new Uint8Array(source, 0, size);
     if (buf.byteLength < size) {
         return {

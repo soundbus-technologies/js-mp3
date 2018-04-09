@@ -212,7 +212,13 @@ var Frameheader = {
 
     read: function (source, position) {
         var pos = position;
-        var buf = source.readFull(4);
+        var result = source.readFull(4);
+        if (result.err) {
+            return {
+                err: result.err
+            }
+        }
+        var buf = result.buf;
         if (buf.byteLength < 4) {
             return {
                 h: 0,
@@ -240,7 +246,13 @@ var Frameheader = {
         var fh = Frameheader.createNew((((b1 << 24) >>> 0) | ((b2 << 16) >>> 0) | ((b3 << 8) >>> 0) | ((b4 << 0) >>> 0)) >>> 0);
         while (!fh.isValid()) {
             // stopPosition++;
-            buf = source.readFull(1);
+            result = source.readFull(1);
+            if (result.err) {
+                return {
+                    err: result.err
+                }
+            }
+            buf = result.buf;
             if (buf.byteLength !== 1) {
                 return {
                     h: 0,
