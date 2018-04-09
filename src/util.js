@@ -62,8 +62,8 @@ function concatTypedArrays(a, b) { // a, b TypedArray of same type
 
 function concatBuffers(a, b) {
     return concatTypedArrays(
-        new Uint8Array(a.buffer || a),
-        new Uint8Array(b.buffer || b)
+        new Uint8Array((!!a ? a.buffer : new ArrayBuffer(0)) || a),
+        new Uint8Array((!!b ? b.buffer : new ArrayBuffer(0)) || b)
     ).buffer;
 }
 
@@ -87,5 +87,28 @@ module.exports = {
     concatTypedArrays: concatTypedArrays,
     concatBuffers: concatBuffers,
     concatBytes: concatBytes,
-    len: len
+    len: len,
+
+    string: {
+        bin: function (v) {
+            return parseInt(v);
+        }
+    },
+
+    number: {
+        bin: function (v) {
+            var sign = (v < 0 ? "-" : "");
+            var result = Math.abs(v).toString(2);
+            while(result.length < 32) {
+                result = "0" + result;
+            }
+            return sign + result;
+        },
+        toUint32: function (v) {
+            return v >>> 0;
+        },
+        toInt32: function (v) {
+            return v >> 0;
+        }
+    }
 };

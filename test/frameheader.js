@@ -1,5 +1,6 @@
 var Frameheader = require('../src/frameheader');
 var consts = require('../src/consts');
+var Mp3 = require('../src/decode');
 var chai = require('chai');
 var should = chai.should();
 var data = require('./data');
@@ -47,7 +48,9 @@ describe('frameheader', function() {
 
     describe('#read()', function () {
         it('should create new instance from provided data.', function() {
-            var result = Frameheader.read(data.buffer(), 0);
+            var source = Mp3.newSource(data.buffer());
+            source.skipTags();
+            var result = Frameheader.read(source, 0);
             should.exist(result);
             result.h.should.be.an('object');
             should.equal(result.h.value, 4294697668, 'frameheader should equal 4294697668');

@@ -6,6 +6,7 @@ var should = chai.should();
 describe('huffman', function() {
     describe('#decode()', function() {
         it('should return new bits object.', function() {
+            // TODO
         });
     });
 });

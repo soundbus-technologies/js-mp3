@@ -65,16 +65,17 @@ var Sideinfo = {
         // Sideinfo is 17 bytes for one channel and 32 bytes for two
         var sideinfo_size = 32;
         if (nch === 1) {
-            sideinfo_size = 17
+            sideinfo_size = 17;
         }
         // Main data size is the rest of the frame,including ancillary data
         var main_data_size = framesize - sideinfo_size - 4; // sync+header
         // CRC is 2 bytes
         if (fheader.protectionBit() === 0) {
-            main_data_size -= 2
+            main_data_size -= 2;
         }
         // Read sideinfo from bitstream into buffer used by Bits()
-        var buf = new Uint8Array(source.buf, pos, sideinfo_size);
+        var buf = source.readFull(sideinfo_size);
+        // var buf = new Uint8Array(source.buf, pos, sideinfo_size);
         if (buf.byteLength < sideinfo_size) {
             return {
                 v: null,
@@ -90,14 +91,14 @@ var Sideinfo = {
         si.MainDataBegin = s.Bits(9);
         // Get private bits. Not used for anything.
         if (fheader.mode() === consts.ModeSingleChannel) {
-            si.PrivateBits = s.Bits(5)
+            si.PrivateBits = s.Bits(5);
         } else {
-            si.PrivateBits = s.Bits(3)
+            si.PrivateBits = s.Bits(3);
         }
         // Get scale factor selection information
         for (var ch = 0; ch < nch; ch++) {
             for (var scfsi_band = 0; scfsi_band < 4; scfsi_band++) {
-                si.Scfsi[ch][scfsi_band] = s.Bits(1)
+                si.Scfsi[ch][scfsi_band] = s.Bits(1);
             }
         }
         // Get the rest of the side information
@@ -112,7 +113,7 @@ var Sideinfo = {
                     si.BlockType[gr][ch] = s.Bits(2);
                     si.MixedBlockFlag[gr][ch] = s.Bits(1);
                     for (var region = 0; region < 2; region++) {
-                        si.TableSelect[gr][ch][region] = s.Bits(5)
+                        si.TableSelect[gr][ch][region] = s.Bits(5);
                     }
                     for (var window = 0; window < 3; window++) {
                         si.SubblockGain[gr][ch][window] = s.Bits(3);

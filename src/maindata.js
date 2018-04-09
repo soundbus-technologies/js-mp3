@@ -138,12 +138,12 @@ var MainData = {
                         }
                     }
                 }
-                result = readHuffman(m, fh, si, md, part_2_start, gr, ch);
-                if (result.err) {
+                var err = readHuffman(m, fh, si, md, part_2_start, gr, ch);
+                if (err) {
                     return {
                         v: null,
                         bits: null,
-                        err: result.err
+                        err: err
                     }
                 }
             }
@@ -187,7 +187,8 @@ var read = function (source, prev, size, offset) {
         vec = prev.Tail(offset);
     }
     // Read the main_data from file
-    var buf = new Uint8Array(source, 0, size);
+    var buf = source.readFull(size);
+    // var buf = new Uint8Array(source, 0, size);
     if (buf.byteLength < size) {
         return {
             m: null,
@@ -195,7 +196,7 @@ var read = function (source, prev, size, offset) {
         }
     }
     return {
-        m: bits.createNew(util.concatBuffers(vec, buf)),
+        m: bits.createNew(util.concatBuffers(vec || new Uint8Array(0), buf)),
         err: null
     }
 };
@@ -218,16 +219,16 @@ var readHuffman = function (m, header, sideInfo, mainData, part_2_start, gr, ch)
         region_1_start = 36;                  // sfb[9/3]*3=36
         region_2_start = consts.SamplesPerGr; // No Region2 for short block case.
     } else {
-        var sfreq = header.samplingFrequency();
+        var sfreq = header.samplingFrequency().value;
         var l = consts.SfBandIndicesSet[sfreq].L;
         var i = sideInfo.Region0Count[gr][ch] + 1;
-        if (i < 0 || len(l) <= i) {
+        if (i < 0 || util.len(l) <= i) {
             // TODO: Better error messages (#3)
             return "mp3: readHuffman failed: invalid index i: " + i;
         }
         region_1_start = l[i];
         var j = sideInfo.Region0Count[gr][ch] + sideInfo.Region1Count[gr][ch] + 2;
-        if (j < 0 || len(l) <= j) {
+        if (j < 0 || util.len(l) <= j) {
             // TODO: Better error messages (#3)
             return "mp3: readHuffman failed: invalid index j: " + j;
         }
@@ -253,9 +254,9 @@ var readHuffman = function (m, header, sideInfo, mainData, part_2_start, gr, ch)
             return err;
         }
         // In the big_values area there are two freq lines per Huffman word
-        mainData.Is[gr][ch][is_pos] = x;
+        mainData.Is[gr][ch][is_pos] = result.x;
         is_pos++;
-        mainData.Is[gr][ch][is_pos] = y;
+        mainData.Is[gr][ch][is_pos] = result.y;
     }
     // Read small values until is_pos = 576 or we run out of huffman data
     // TODO: Is this comment wrong?
@@ -267,22 +268,22 @@ var readHuffman = function (m, header, sideInfo, mainData, part_2_start, gr, ch)
         if (result.err) {
             return err;
         }
-        mainData.Is[gr][ch][is_pos] = v;
+        mainData.Is[gr][ch][is_pos] = result.v;
         is_pos++;
         if (is_pos >= consts.SamplesPerGr) {
             break;
         }
-        mainData.Is[gr][ch][is_pos] = w;
+        mainData.Is[gr][ch][is_pos] = result.w;
         is_pos++;
         if (is_pos >= consts.SamplesPerGr) {
             break;
         }
-        mainData.Is[gr][ch][is_pos] = x;
+        mainData.Is[gr][ch][is_pos] = result.x;
         is_pos++;
         if (is_pos >= consts.SamplesPerGr) {
             break;
         }
-        mainData.Is[gr][ch][is_pos] = y;
+        mainData.Is[gr][ch][is_pos] = result.y;
         is_pos++;
     }
     // Check that we didn't read past the end of this section

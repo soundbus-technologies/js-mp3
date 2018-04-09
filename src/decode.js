@@ -1,6 +1,5 @@
 var Frame = require('./frame');
-var Frameheader = require('./frameheader');
-var consts = require('./consts');
+var util = require('./util');
 
 const invalidLength = -1;
 
@@ -31,32 +30,50 @@ var Mp3 = {
         };
 
         source.skipTags = function () {
-            var buf;
-            if (source.buf.length < 3) {
-                buf = new Uint8Array(source.buf);
-            } else {
-                buf = new Uint8Array(source.buf, 0, 3);
-            }
+            // TODO DELETE comment
+            // var buf;
+            // if (source.buf.length < 3) {
+            //     buf = new Uint8Array(source.buf);
+            // } else {
+            //     buf = new Uint8Array(source.buf, 0, 3);
+            // }
+
+            var buf = source.readFull(3);
 
             // decode UTF-8
             var t = String.fromCharCode.apply(null, buf);
             switch (t) {
                 case "TAG":
-                    buf = new Uint8Array(source.buf, 3, Math.min(125, source.buf.byteLength));
+                    // TODO DELETE comment
+                    // buf = new Uint8Array(source.buf, 3, Math.min(125, source.buf.byteLength));
+                    buf = source.readFull(125);
                     break;
                 case 'ID3':
-                    // Skip version (2 bytes) and flag (1 byte), so from offset 6
-                    buf = new Uint8Array(source.buf, 6, Math.min(4, source.buf.byteLength));
+                    // TODO DELETE comment
+                    // Skip version (2 bytes) and flag (1 byte)
+                    buf = source.readFull(3);
+
+                    buf = source.readFull(4);
+                    // TODO DELETE comment
+                    // buf = new Uint8Array(source.buf, 6, Math.min(4, source.buf.byteLength));
                     if (buf.byteLength !== 4) {
-                        return;
+                        return {
+                            err: "data not enough."
+                        };
                     }
                     var size = (((buf[0] >>> 0) << 21) >>> 0) | (((buf[1] >>> 0) << 14) >>> 0) | (((buf[2] >>> 0) << 7) >>> 0) | (buf[3] >>> 0);
-                    buf = new Uint8Array(source.buf, 6 + buf.byteLength, Math.min(size, source.buf.byteLength));
+                    buf = source.readFull(size);
+                    // TODO DELETE comment
+                    // buf = new Uint8Array(source.buf, 6 + buf.byteLength, Math.min(size, source.buf.byteLength));
                     break;
                 default:
-                    buf = null;
+                    source.unread(buf);
                     break;
             }
+        };
+
+        source.unread = function (buf) {
+            source.pos -= buf.byteLength
         };
 
         source.rewind = function() {
@@ -72,25 +89,32 @@ var Mp3 = {
         var decoder = {
             source: s,
             sampleRate: 0,
-            length: 0,
             frame: null,
             frameStarts: [],
             buf: null,
-            pos: 0
+            pos: 0,
+            length: invalidLength
         };
 
+        // ======= Methods of decoder :: start =========
         decoder.readFrame = function () {
-            var result  = Frame.read(decoder.source, decoder.source.pos);
+            var result = Frame.read(decoder.source, decoder.source.pos);
             if (result.err) {
                 return {
                     err: result.err
                 }
             }
+            decoder.frame = result.f;
             var pcm_buf = decoder.frame.decode();
-            decoder.buf = util.concatTypedArrays(decoder.buf, pcm_buf).buffer;
-            return {
-            }
+            decoder.buf = util.concatBuffers(decoder.buf, pcm_buf).buffer;
+            return null;
         };
+        // ======= Methods of decoder :: end =========
+
+        var r = s.skipTags();
+        if (r && r.err) {
+            return null;
+        }
 
         var err = decoder.readFrame();
         if (err) {

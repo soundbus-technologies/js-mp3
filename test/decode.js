@@ -1,4 +1,3 @@
-var assert = require('assert');
 var Mp3 = require('../src/decode');
 var data = require('./data');
 var chai = require('chai');
@@ -35,14 +34,6 @@ describe('mp3', function() {
             var decoder = Mp3.newDecoder(data.buffer());
             should.exist(decoder, 'decoder should exist.');
             decoder.should.be.an('object');
-        });
-
-        describe('#readFrame()', function () {
-            var decoder = Mp3.newDecoder(data.buffer());
-            var result = decoder.readFrame();
-            result.should.be.an('object');
-            should.not.exist(result.err);
-            should.exist(decoder.frame);
         });
     });
 });

@@ -1,4 +1,5 @@
 var Frame = require('../src/frame');
+var Mp3 = require('../src/decode');
 var chai = require('chai');
 var should = chai.should();
 var data = require('./data');
@@ -24,7 +25,9 @@ describe('frame', function() {
 
     describe('#read()', function () {
         it('should create frame instance by provided data.', function () {
-            var result = Frame.read(data.buffer(), 0, null);
+            var source = Mp3.newSource(data.buffer());
+            source.skipTags();
+            var result = Frame.read(source, 0, null);
             should.exist(result);
             result.should.be.an('object');
             result.f.should.be.an('object');

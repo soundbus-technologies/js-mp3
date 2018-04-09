@@ -15,7 +15,6 @@ var consts = {
     ModeSingleChannel: 3,
 
     SamplesPerGr: 576,
-    BytesPerFrame: this.SamplesPerGr * 2 * 4,
 
     SamplingFrequency44100: 0,
     SamplingFrequency48000: 1,
@@ -55,5 +54,7 @@ var consts = {
         }
     }
 };
+
+consts.BytesPerFrame = consts.SamplesPerGr * 2 * 4;
 
 module.exports = consts;

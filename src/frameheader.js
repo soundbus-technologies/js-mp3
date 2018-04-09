@@ -211,8 +211,9 @@ var Frameheader = {
     },
 
     read: function (source, position) {
-        var stopPosition = 4;
-        if (source.buf.byteLength < stopPosition) {
+        var pos = position;
+        var buf = source.readFull(4);
+        if (buf.byteLength < 4) {
             return {
                 h: 0,
                 position: 0,
@@ -220,7 +221,17 @@ var Frameheader = {
             }
         }
 
-        var buf = new Uint8Array(source.buf, 0, stopPosition);
+        // TODO delete comment
+        // var stopPosition = 4;
+        // if (source.buf.byteLength < stopPosition) {
+        //     return {
+        //         h: 0,
+        //         position: 0,
+        //         err: "UnexpectedEOF readHeader (1)"
+        //     }
+        // }
+
+        // var buf = new Uint8Array(source.buf, 0, stopPosition);
         var b1 = buf[0] >>> 0;
         var b2 = buf[1] >>> 0;
         var b3 = buf[2] >>> 0;
@@ -228,10 +239,9 @@ var Frameheader = {
 
         var fh = Frameheader.createNew((((b1 << 24) >>> 0) | ((b2 << 16) >>> 0) | ((b3 << 8) >>> 0) | ((b4 << 0) >>> 0)) >>> 0);
         while (!fh.isValid()) {
-            stopPosition++;
-            try {
-                buf = new Uint8Array(source, stopPosition - 4, stopPosition);
-            } catch (e) {
+            // stopPosition++;
+            buf = source.readFull(1);
+            if (buf.byteLength !== 1) {
                 return {
                     h: 0,
                     position: 0,
@@ -239,13 +249,29 @@ var Frameheader = {
                 }
             }
 
-            b1 = buf[0] >>> 0;
-            b2 = buf[1] >>> 0;
-            b3 = buf[2] >>> 0;
-            b4 = buf[3] >>> 0;
+            b1 = b2;
+            b2 = b3;
+            b3 = b4;
+            b4 = buf[0] >>> 0;
+
+            // try {
+            //     buf = new Uint8Array(source, stopPosition - 4, stopPosition);
+            // } catch (e) {
+            //     return {
+            //         h: 0,
+            //         position: 0,
+            //         err: "UnexpectedEOF readHeader (2)"
+            //     }
+            // }
+            //
+            // b1 = buf[0] >>> 0;
+            // b2 = buf[1] >>> 0;
+            // b3 = buf[2] >>> 0;
+            // b4 = buf[3] >>> 0;
 
             fh = Frameheader.createNew((((b1 << 24) >>> 0) | ((b2 << 16) >>> 0) | ((b3 << 8) >>> 0) | ((b4 << 0) >>> 0)) >>> 0);
-            position++;
+            pos++;
+            // position++;
         }
 
         // If we get here we've found the sync word, and can decode the header
@@ -260,8 +286,8 @@ var Frameheader = {
 
         return {
             h: fh,
-            stopPosition: stopPosition,
-            position: position
+            // stopPosition: stopPosition,
+            position: pos
         }
     }
 };

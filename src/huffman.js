@@ -282,41 +282,42 @@ var huffmanTable = new Uint16Array([
 
 const uint16Size = 1; // in byte
 
+huffmanTable.slice();
 var huffmanMain = [
-    { view: null, linbits: 0},                                                   // Table  0
-    { view: new DataView(huffmanTable.buffer, 0, 7), linbits: 0},                // Table  1
-    { view: new DataView(huffmanTable.buffer, 7, (7 + 17)), linbits: 0},         // Table  2
-    { view: new DataView(huffmanTable.buffer, 24, (24 + 17)), linbits: 0},       // Table  3
-    { view: null, linbits: 0},                                                   // Table  4
-    { view: new DataView(huffmanTable.buffer, 41, (41 + 31)), linbits: 0},       // Table  5
-    { view: new DataView(huffmanTable.buffer, 72, (72 + 31)), linbits: 0},       // Table  6
-    { view: new DataView(huffmanTable.buffer, 103, (103 + 71)), linbits: 0},     // Table  7
-    { view: new DataView(huffmanTable.buffer, 174, (174 + 71)), linbits: 0},     // Table  8
-    { view: new DataView(huffmanTable.buffer, 245, (245 + 71)), linbits: 0},     // Table  9
-    { view: new DataView(huffmanTable.buffer, 316, (316 + 127)), linbits: 0},    // Table  10
-    { view: new DataView(huffmanTable.buffer, 443, (443 + 127)), linbits: 0},    // Table  11
-    { view: new DataView(huffmanTable.buffer, 570, (570 + 127)), linbits: 0},    // Table  12
-    { view: new DataView(huffmanTable.buffer, 697, (697 + 511)), linbits: 0},    // Table  13
-    { view: null, linbits: 0},                                                   // Table  14
-    { view: new DataView(huffmanTable.buffer, 1208, (1208 + 511)), linbits: 0},  // Table  15
-    { view: new DataView(huffmanTable.buffer, 1719, (1719 + 511)),  linbits: 1}, // Table  16
-    { view: new DataView(huffmanTable.buffer, 1719, (1719 + 511)),  linbits: 2}, // Table  17
-    { view: new DataView(huffmanTable.buffer, 1719, (1719 + 511)),  linbits: 3}, // Table  18
-    { view: new DataView(huffmanTable.buffer, 1719, (1719 + 511)),  linbits: 4}, // Table  19
-    { view: new DataView(huffmanTable.buffer, 1719, (1719 + 511)),  linbits: 6}, // Table  20
-    { view: new DataView(huffmanTable.buffer, 1719, (1719 + 511)),  linbits: 8}, // Table  21
-    { view: new DataView(huffmanTable.buffer, 1719, (1719 + 511)),  linbits: 10},// Table  22
-    { view: new DataView(huffmanTable.buffer, 1719, (1719 + 511)),  linbits: 13},// Table  23
-    { view: new DataView(huffmanTable.buffer, 2230, (2230 + 512)),  linbits: 4}, // Table  24
-    { view: new DataView(huffmanTable.buffer, 2230, (2230 + 512)),  linbits: 5}, // Table  25
-    { view: new DataView(huffmanTable.buffer, 2230, (2230 + 512)),  linbits: 6}, // Table  26
-    { view: new DataView(huffmanTable.buffer, 2230, (2230 + 512)),  linbits: 7}, // Table  27
-    { view: new DataView(huffmanTable.buffer, 2230, (2230 + 512)),  linbits: 8}, // Table  28
-    { view: new DataView(huffmanTable.buffer, 2230, (2230 + 512)),  linbits: 9}, // Table  29
-    { view: new DataView(huffmanTable.buffer, 2230, (2230 + 512)),  linbits: 11},// Table  30
-    { view: new DataView(huffmanTable.buffer, 2230, (2230 + 512)),  linbits: 13},// Table  31
-    { view: new DataView(huffmanTable.buffer, 2742, (2742 + 31)),  linbits: 0},  // Table  32
-    { view: new DataView(huffmanTable.buffer, 2773, (2773 + 31)),  linbits: 0},  // Table  33
+    { hufftable: null, linbits: 0},                                                   // Table  0
+    { hufftable: huffmanTable.slice(0, 7), linbits: 0},                // Table  1
+    { hufftable: huffmanTable.slice(7, (7 + 17)), linbits: 0},         // Table  2
+    { hufftable: huffmanTable.slice(24, (24 + 17)), linbits: 0},       // Table  3
+    { hufftable: null, linbits: 0},                                                   // Table  4
+    { hufftable: huffmanTable.slice(41, (41 + 31)), linbits: 0},       // Table  5
+    { hufftable: huffmanTable.slice(72, (72 + 31)), linbits: 0},       // Table  6
+    { hufftable: huffmanTable.slice(103, (103 + 71)), linbits: 0},     // Table  7
+    { hufftable: huffmanTable.slice(174, (174 + 71)), linbits: 0},     // Table  8
+    { hufftable: huffmanTable.slice(245, (245 + 71)), linbits: 0},     // Table  9
+    { hufftable: huffmanTable.slice(316, (316 + 127)), linbits: 0},    // Table  10
+    { hufftable: huffmanTable.slice(443, (443 + 127)), linbits: 0},    // Table  11
+    { hufftable: huffmanTable.slice(570, (570 + 127)), linbits: 0},    // Table  12
+    { hufftable: huffmanTable.slice(697, (697 + 511)), linbits: 0},    // Table  13
+    { hufftable: null, linbits: 0},                                                   // Table  14
+    { hufftable: huffmanTable.slice(1208, (1208 + 511)), linbits: 0},  // Table  15
+    { hufftable: huffmanTable.slice(1719, (1719 + 511)),  linbits: 1}, // Table  16
+    { hufftable: huffmanTable.slice(1719, (1719 + 511)),  linbits: 2}, // Table  17
+    { hufftable: huffmanTable.slice(1719, (1719 + 511)),  linbits: 3}, // Table  18
+    { hufftable: huffmanTable.slice(1719, (1719 + 511)),  linbits: 4}, // Table  19
+    { hufftable: huffmanTable.slice(1719, (1719 + 511)),  linbits: 6}, // Table  20
+    { hufftable: huffmanTable.slice(1719, (1719 + 511)),  linbits: 8}, // Table  21
+    { hufftable: huffmanTable.slice(1719, (1719 + 511)),  linbits: 10},// Table  22
+    { hufftable: huffmanTable.slice(1719, (1719 + 511)),  linbits: 13},// Table  23
+    { hufftable: huffmanTable.slice(2230, (2230 + 512)),  linbits: 4}, // Table  24
+    { hufftable: huffmanTable.slice(2230, (2230 + 512)),  linbits: 5}, // Table  25
+    { hufftable: huffmanTable.slice(2230, (2230 + 512)),  linbits: 6}, // Table  26
+    { hufftable: huffmanTable.slice(2230, (2230 + 512)),  linbits: 7}, // Table  27
+    { hufftable: huffmanTable.slice(2230, (2230 + 512)),  linbits: 8}, // Table  28
+    { hufftable: huffmanTable.slice(2230, (2230 + 512)),  linbits: 9}, // Table  29
+    { hufftable: huffmanTable.slice(2230, (2230 + 512)),  linbits: 11},// Table  30
+    { hufftable: huffmanTable.slice(2230, (2230 + 512)),  linbits: 13},// Table  31
+    { hufftable: huffmanTable.slice(2742, (2742 + 31)),  linbits: 0},  // Table  32
+    { hufftable: huffmanTable.slice(2773, (2773 + 31)),  linbits: 0},  // Table  33
 ];
 
 // m -> bits
@@ -325,9 +326,9 @@ function decode(m, tableNum) {
     var point = 0;
     var error = 1;
     var bitsleft = 32;
-    var view = huffmanMain[tableNum].view;
+    var hufftable = huffmanMain[tableNum].hufftable;
     var linbits = huffmanMain[tableNum].linbits;
-    if (null === view) {
+    if (null === hufftable) {
         return {
             x: 0,
             y: 0,
@@ -338,25 +339,25 @@ function decode(m, tableNum) {
     }
     while(true) { // Start reading the Huffman code word,bit by bit
         // Check if we've matched a code word
-        if (view.getUint16(point) & 0xff00 === 0) {
+        if ((hufftable[point] & 0xff00) >>> 0 === 0) {
             error = 0;
-            x = ((view.getUint16(point) >> 4) &0xf);
-            y = (view.getUint16(point) &0xf);
+            x = (((hufftable[point] >>> 4) >>> 0) & 0xf) >>> 0;
+            y = (hufftable[point] & 0xf) >>> 0;
             break;
         }
         if (m.Bit() !== 0) { // Go right in tree
-            while(view.getUint16(point) & 0xff >= 250) {
-                point += view.getInt32(point) & 0xff;
+            while((hufftable[point] & 0xff) >>> 0 >= 250) {
+                point += ((hufftable[point] & 0xff) >>> 0);
             }
-            point += view.getInt32(point) & 0xff;
+            point += ((hufftable[point] & 0xff) >>> 0);
         } else { // Go left in tree
-            while((view.getUint16(point) >> 8) >= 250) {
-                point += view.getInt32(point) >> 8;
+            while(((hufftable[point] >>> 8) >>> 0) >= 250) {
+                point += (hufftable[point] >>> 8) >>> 0;
             }
-            point += view.getInt32(point) >> 8;
+            point += (hufftable[point] >>> 8) >>> 0;
         }
         bitsleft--;
-        if ((bitsleft <= 0) || (point >= treelen)) {
+        if ((bitsleft <= 0) || (point >= hufftable.length)) {
             break
         }
     }
@@ -370,10 +371,10 @@ function decode(m, tableNum) {
         };
     }
     if (tableNum > 31) { // Process sign encodings for quadruples tables.
-        v = (y >> 3) & 1;
-        w = (y >> 2) & 1;
-        x = (y >> 1) & 1;
-        y = y & 1;
+        v = (((y >>> 3) >>> 0) & 1) >>> 0;
+        w = (((y >>> 2) >>> 0) & 1) >>> 0;
+        x = (((y >>> 1) >>> 0) & 1) >>> 0;
+        y = (y & 1) >>> 0;
         if ((v !== 0) && (m.Bit() === 1)) {
             v = -v;
         }

@@ -165,13 +165,12 @@ var ca = new Float32Array([
 ]);
 
 var Frame = {
-    createNew: function () {
+    createNew: function (header, sideInfo, mainData, mainDataBits) {
         var frame = {
-            header: null,
-            sideInfo: null,
-            mainData: null,
-
-            mainDataBits: null
+            header: header,
+            sideInfo: sideInfo,
+            mainData: mainData,
+            mainDataBits: mainDataBits
         };
 
         frame.store = new Array(18);
@@ -334,7 +333,7 @@ var Frame = {
 
         frame.requantize = function (gr, ch) {
             // Setup sampling frequency index
-            var sfreq = frame.header.samplingFrequency();
+            var sfreq = frame.header.samplingFrequency().value;
             // Determine type of block to process
             if (frame.sideInfo.WinSwitchFlag[gr][ch] === 1 && frame.sideInfo.BlockType[gr][ch]
                                                               === 2) { // Short blocks
@@ -396,7 +395,7 @@ var Frame = {
             } else { // Only long blocks
                 var sfb = 0;
                 var next_sfb = consts.SfBandIndicesSet[sfreq].L[sfb + 1];
-                for (var i = 0; i < int(f.sideInfo.Count1[gr][ch]); i++) {
+                for (var i = 0; i < frame.sideInfo.Count1[gr][ch]; i++) {
                     if (i === next_sfb) {
                         sfb++;
                         next_sfb = consts.SfBandIndicesSet[sfreq].L[sfb + 1];
@@ -444,7 +443,7 @@ var Frame = {
 
         frame.reorder = function (gr, ch) {
             var re = new Float32Array(consts.SamplesPerGr);
-            var sfreq = frame.header.samplingFrequency();   // Setup sampling freq index
+            var sfreq = frame.header.samplingFrequency().value;   // Setup sampling freq index
             // Only reorder short blocks
             if ((frame.sideInfo.WinSwitchFlag[gr][ch] === 1) && (frame.sideInfo.BlockType[gr][ch] == 2)) { // Short blocks
                 // Check if the first two subbands
@@ -558,22 +557,22 @@ var Frame = {
             }
         };
 
+        frame.samplingFrequency = function () {
+            return frame.header.samplingFrequency().Int();
+        };
+
         return frame;
     },
 
-    readCRC: function (source, startPosition) {
-        if (source.byteLength < startPosition + 2) {
-            return "UnexpectedEOF readCRC"
-        }
-        var d = new Uint8Array(source, startPosition, 2);
-        if (d.byteLength < 2) {
+    readCRC: function (source) {
+        var buf = source.readFull(2);
+        if (buf.byteLength < 2) {
             return "mp3: error at readCRC";
         }
     },
 
     read: function (source, position, prev) {
-        var pos = position;
-        var rr = Frameheader.read(source, pos)
+        var rr = Frameheader.read(source, position)
         if (rr.err) {
             return {
                 f: null,
@@ -582,11 +581,12 @@ var Frame = {
             }
         }
 
+        var pos = rr.position;
         var fh = rr.h;
-        pos = rr.stopPosition;
+        // pos = rr.stopPosition;
         if (fh.protectionBit() === 0) {
-            pos += 2;
-            var err = Frame.readCRC(source, rr.stopPosition);
+            // pos += 2;
+            var err = Frame.readCRC(source);
             if (typeof(err) !== 'undefined') {
                 return {
                     f: null,
@@ -631,7 +631,6 @@ var Frame = {
             prevM = prev;
         }
 
-        // TODO maindata implement
         result = Maindata.read(source, prevM, fh, si);
         if (result.err) {
             return {
@@ -641,7 +640,17 @@ var Frame = {
             }
         }
 
-        return {};
+        var f = Frame.createNew(fh, si, result.v, result.bits);
+        if (prev) {
+            f.store = prev.store;
+            f.v_vec = prev.v_vec;
+        }
+
+        return {
+            f: f,
+            position: pos,
+            err: null
+        };
     }
 };
 

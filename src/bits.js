@@ -53,6 +53,18 @@ var Bits = {
             return bits.vec.byteLength;
         };
 
+        /**
+         * @return {number}
+         */
+        bits.BitPos = function () {
+            return ((bits.bytePos << 3) >>> 0) + bits.bitPos;
+        };
+
+        bits.SetPos = function (pos) {
+            bits.bytePos = (pos >>> 3) >>> 0;
+            bits.bitPos = (pos & 0x7) >>> 0;
+        };
+
         return bits;
     },
     append: function (bits, buf) {
