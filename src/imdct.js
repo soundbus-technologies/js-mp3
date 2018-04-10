@@ -11,22 +11,22 @@ for (var i = 0; i < 18; i++) {
 
 var init = function () {
     for (var i = 0; i < 36; i++) {
-        imdctWinData[0][i] = Math.sin(Math.Pi / 36 * (i + 0.5));
+        imdctWinData[0][i] = Math.sin(Math.PI / 36 * (i + 0.5));
     }
     for (var i = 0; i < 18; i++) {
-        imdctWinData[1][i] = Math.sin(Math.Pi / 36 * (i + 0.5));
+        imdctWinData[1][i] = Math.sin(Math.PI / 36 * (i + 0.5));
     }
     for (var i = 18; i < 24; i++) {
         imdctWinData[1][i] = 1.0;
     }
     for (var i = 24; i < 30; i++) {
-        imdctWinData[1][i] = Math.sin(Math.Pi / 12 * (i + 0.5 - 18.0));
+        imdctWinData[1][i] = Math.sin(Math.PI / 12 * (i + 0.5 - 18.0));
     }
     for (var i = 30; i < 36; i++) {
         imdctWinData[1][i] = 0.0;
     }
     for (var i = 0; i < 12; i++) {
-        imdctWinData[2][i] = Math.sin(Math.Pi / 12 * (i + 0.5));
+        imdctWinData[2][i] = Math.sin(Math.PI / 12 * (i + 0.5));
     }
     for (var i = 12; i < 36; i++) {
         imdctWinData[2][i] = 0.0;
@@ -35,7 +35,7 @@ var init = function () {
         imdctWinData[3][i] = 0.0;
     }
     for (var i = 6; i < 12; i++) {
-        imdctWinData[3][i] = Math.sin(Math.Pi / 12 * (i + 0.5 - 6.0));
+        imdctWinData[3][i] = Math.sin(Math.PI / 12 * (i + 0.5 - 6.0));
     }
     for (var i = 12; i < 18; i++) {
         imdctWinData[3][i] = 1.0;
@@ -44,10 +44,17 @@ var init = function () {
         imdctWinData[3][i] = Math.sin(Math.Pi / 36 * (i + 0.5));
     }
 
-    const N = 12
+    const cosN12_N = 12
     for (var i = 0; i < 6; i++) {
         for (var j = 0; j < 12; j++) {
-            cosN12[i][j] = Math.cos(Math.Pi / (2 * N) * (2*j + 1 + N/2) * (2*i + 1));
+            cosN12[i][j] = Math.cos(Math.PI / (2 * cosN12_N) * (2*j + 1 + cosN12_N/2) * (2*i + 1));
+        }
+    }
+
+    const cosN36_N = 36;
+    for (var i = 0; i < 18; i++) {
+        for (var j = 0; j < 36; j++) {
+            cosN36[i][j] = Math.cos(Math.PI / (2 * cosN36_N) * (2*j + 1 + cosN36_N/2) * (2*i + 1));
         }
     }
 };

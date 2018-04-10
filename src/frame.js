@@ -173,18 +173,18 @@ var Frame = {
             mainDataBits: mainDataBits
         };
 
-        frame.store = new Array(18);
+        frame.store = new Array(2);
         for (var i = 0; i < frame.store.length; i++) {
             var a = new Array(32);
             for (var j = 0; j < a.length; j++) {
-                a[j] = new Float32Array(2);
+                a[j] = new Float32Array(18);
             }
             frame.store[i] = a;
         }
 
-        frame.v_vec = new Array(1024);
+        frame.v_vec = new Array(2);
         for (var i = 0; i < frame.v_vec.length; i++) {
-            frame.v_vec[i] = new Float32Array(2);
+            frame.v_vec[i] = new Float32Array(1024);
         }
 
         /**
@@ -205,7 +205,7 @@ var Frame = {
                     frame.antialias(gr, ch);
                     frame.hybridSynthesis(gr, ch);
                     frame.frequencyInversion(gr, ch);
-                    frame.subbandSynthesis(gr, ch, new Uint8Array(out, consts.SamplesPerGr * 4 * gr));
+                    out = frame.subbandSynthesis(gr, ch, new Uint8Array(out, consts.SamplesPerGr * 4 * gr));
                 }
             }
             return out;
@@ -252,7 +252,10 @@ var Frame = {
                 for (var i = 0; i < 18; i++) {
                     inData[i] = frame.mainData.Is[gr][ch][sb*18+i];
                 }
+                console.log('inData: ' + inData);
+                console.log('----------');
                 var rawout = Imdct.Win(inData, bt);
+                console.log('rawout: ' + rawout);
                 // Overlapp add with stored vector into main_data vector
                 for (var i = 0; i < 18; i++) {
                     frame.mainData.Is[gr][ch][sb*18+i] = rawout[i] + frame.store[ch][sb][i];
@@ -555,6 +558,7 @@ var Frame = {
                     }
                 }
             }
+            return out.buffer;
         };
 
         frame.samplingFrequency = function () {

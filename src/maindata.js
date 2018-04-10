@@ -202,7 +202,7 @@ var read = function (source, prev, size, offset) {
         }
     }
     return {
-        m: bits.createNew(util.concatBuffers(vec || new Uint8Array(0), buf)),
+        m: bits.createNew(util.concatBuffers(vec, new Uint8Array(buf.slice()).buffer)),
         err: null
     }
 };
@@ -255,7 +255,11 @@ var readHuffman = function (m, header, sideInfo, mainData, part_2_start, gr, ch)
             table_num = sideInfo.TableSelect[gr][ch][2];
         }
         // Get next Huffman coded words
+        console.log('is_pos: ' + is_pos)
+        console.log('table_num: ' + table_num)
         var result = huffman.decode(m, table_num);
+        console.log('x: ' + result.x + ', y: ' + result.y);
+        console.log('------');
         if (result.err) {
             return err;
         }

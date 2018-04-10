@@ -39,6 +39,7 @@ describe('mp3', function() {
             decoder.should.be.an('object');
 
             var pcm_buffer = decoder.decode();
+            console.log(new Uint8Array(pcm_buffer));
             console.log('pcm_buffer byteLength: ' + pcm_buffer.byteLength);
         });
     });

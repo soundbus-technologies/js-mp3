@@ -1,5 +1,7 @@
 var Frame = require('./frame');
 var util = require('./util');
+var consts = require('./consts');
+var Frameheader = require('./frameheader');
 
 const invalidLength = -1;
 
@@ -25,7 +27,8 @@ var Mp3 = {
 
         source.readFull = function (length) {
             try {
-                var buf = new Uint8Array(source.buf, source.pos, length);
+                var l = Math.min(source.buf.byteLength - source.pos, length);
+                var buf = new Uint8Array(source.buf, source.pos, l);
                 source.pos += buf.byteLength;
                 return {
                     buf: buf,
@@ -37,6 +40,13 @@ var Mp3 = {
                     err: e.toString()
                 }
             }
+        };
+
+        source.getPos = function () {
+            if (source.pos > 3) {
+                return source.pos - 3; // skip tags
+            }
+            return source.pos;
         };
 
         source.skipTags = function () {
@@ -159,6 +169,38 @@ var Mp3 = {
             }
             return decoder.buf;
         };
+
+        decoder.ensureFrameStartsAndLength = function () {
+            if (decoder.length !== invalidLength) {
+                return {}
+            }
+
+            decoder.source.rewind();
+
+            var l = 0;
+            while(true) {
+                var result = Frameheader.read(decoder.source, decoder.source.getPos());
+                if (result.err) {
+                    if (result.err.toString().indexOf("UnexpectedEOF") > -1) {
+                        break;
+                    }
+                    return {
+                        err: result.err
+                    };
+                }
+                decoder.frameStarts.push(result.position);
+                l += consts.BytesPerFrame;
+                result = decoder.source.readFull(result.h.frameSize() - 4);
+                if (result.err) {
+                    break;
+                }
+            }
+            decoder.length = l;
+
+            decoder.source.rewind();
+
+            return {};
+        };
         // ======= Methods of decoder :: end =========
 
         var r = s.skipTags();
@@ -172,6 +214,12 @@ var Mp3 = {
         }
 
         decoder.sampleRate = decoder.frame.samplingFrequency();
+
+        result = decoder.ensureFrameStartsAndLength();
+        if (result.err) {
+            return null;
+        }
+
         return decoder;
     }
 };
