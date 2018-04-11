@@ -210,7 +210,6 @@ var Frame = {
                     frame.subbandSynthesis(gr, ch, out.subarray(consts.SamplesPerGr * 4 * gr));
                 }
             }
-            // console.log("out: " + out);
             return out;
         };
 
@@ -524,10 +523,9 @@ var Frame = {
                     if (i === next_sfb) {
                         // Copy reordered data back to the original vector
                         var j = 3 * consts.SfBandIndicesSet[sfreq].S[sfb];
-                        frame.mainData.Is[gr][ch].set(re.slice(0, 3*win_len), j);// copy(frame.mainData.Is[gr][ch][j:j+3*win_len], re[0:3*win_len])
-                        // for (var s = 0; s < 3*win_len; s++) {
-                        //     frame.mainData.Is[gr][ch][j + s] = re[s]; // copy(frame.mainData.Is[gr][ch][j:j+3*win_len], re[0:3*win_len])
-                        // }
+                        for (var s = 0; s < 3*win_len; s++) {
+                            frame.mainData.Is[gr][ch][j + s] = re[s]; // copy(frame.mainData.Is[gr][ch][j:j+3*win_len], re[0:3*win_len])
+                        }
                         // Check if this band is above the rzero region,if so we're done
                         if (i >= frame.sideInfo.Count1[gr][ch]) {
                             return;
@@ -545,10 +543,9 @@ var Frame = {
                 }
                 // Copy reordered data of last band back to original vector
                 var j = 3 * consts.SfBandIndicesSet[sfreq].S[12];
-                frame.mainData.Is[gr][ch].set(re.slice(0, 3*win_len), j);// copy(frame.mainData.Is[gr][ch][j:j+3*win_len], re[0:3*win_len])
-                // for (var s = 0; s < 3*win_len; s++) {
-                //     frame.mainData.Is[gr][ch][j + s] = re[s]; // copy(frame.mainData.Is[gr][ch][j:j+3*win_len], re[0:3*win_len])
-                // }
+                for (var s = 0; s < 3*win_len; s++) {
+                    frame.mainData.Is[gr][ch][j + s] = re[s]; // copy(frame.mainData.Is[gr][ch][j:j+3*win_len], re[0:3*win_len])
+                }
             }
         };
 

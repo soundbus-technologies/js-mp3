@@ -16,7 +16,7 @@ var MainData = {
 
         util.init3dArray(mainData, 'ScalefacL', 2, 2, 22);      // 0-4 bits
         util.init4dArray(mainData, 'ScalefacS', 2, 2, 13, 3);   // 0-4 bits
-        util.init3dFloat32Array(mainData, 'Is', 2, 2, 576);            // Huffman coded freq. lines
+        util.init3dArray(mainData, 'Is', 2, 2, 576);            // Huffman coded freq. lines
 
         return mainData;
     },

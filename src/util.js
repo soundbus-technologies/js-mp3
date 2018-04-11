@@ -30,21 +30,6 @@ function init3dArray(root, prop, first, second, third) {
     }
 }
 
-function init3dFloat32Array(root, prop, first, second, third) {
-    root[prop] = [];
-    for (var i = 0; i < first; i++) {
-        root[prop].push([]);
-    }
-
-    for(var i = 0; i < root[prop].length; i++) {
-        for (var j = 0; j < second; j++) {
-            var a = new Uint32Array(third);
-            a.fill(0);
-            root[prop][i].push(a);
-        }
-    }
-}
-
 function init4dArray(root, prop, first, second, third, fourth) {
     root[prop] = [];
     for (var i = 0; i < first; i++) {
@@ -98,7 +83,6 @@ function len(v) {
 module.exports = {
     init2dArray: init2dArray,
     init3dArray: init3dArray,
-    init3dFloat32Array: init3dFloat32Array,
     init4dArray: init4dArray,
     concatTypedArrays: concatTypedArrays,
     concatBuffers: concatBuffers,

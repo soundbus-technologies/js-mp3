@@ -162,6 +162,7 @@ var Mp3 = {
             }
             decoder.frame = result.f;
             var pcm_buf = decoder.frame.decode();
+            console.log('pcm_buf: ' + new Uint8Array(pcm_buf));
             decoder.buf = util.concatBuffers(decoder.buf, pcm_buf);
             // console.log('decoder.buf: ' + new Uint8Array(decoder.buf));
             return {};
