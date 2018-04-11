@@ -46,7 +46,9 @@ var Bits = {
         };
 
         bits.Tail = function (offset) {
-            return new Uint8Array(bits.vec, bits.vec.byteLength - offset).buffer;
+            var a = new Uint8Array(bits.vec);
+            return a.slice(bits.vec.byteLength - offset).buffer;
+            // return new Uint8Array(bits.vec, bits.vec.byteLength - offset).buffer;
         };
 
         bits.LenInBytes = function () {

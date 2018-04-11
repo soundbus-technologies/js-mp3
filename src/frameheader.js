@@ -177,9 +177,10 @@ var Frameheader = {
          * @returns {number}
          */
         fh.frameSize = function () {
-            return Math.floor((144 * Frameheader.bitrate(fh.layer(), fh.bitrateIndex()))
-                   / fh.samplingFrequency().Int()
-                   + fh.paddingBit());
+            var value = (144 * Frameheader.bitrate(fh.layer(), fh.bitrateIndex()))
+                        / fh.samplingFrequency().Int()
+                        + fh.paddingBit();
+            return Math.floor(value);
         };
 
         /**

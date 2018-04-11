@@ -280,44 +280,41 @@ var huffmanTable = new Uint16Array([
     0x000a, 0x000b, 0x0401, 0x0201, 0x000c, 0x000d, 0x0201, 0x000e, 0x000f,
 ]);
 
-const uint16Size = 1; // in byte
-
-huffmanTable.slice();
 var huffmanMain = [
-    { hufftable: null, linbits: 0},                                                   // Table  0
-    { hufftable: huffmanTable.slice(0, 7), linbits: 0},                // Table  1
-    { hufftable: huffmanTable.slice(7, (7 + 17)), linbits: 0},         // Table  2
-    { hufftable: huffmanTable.slice(24, (24 + 17)), linbits: 0},       // Table  3
-    { hufftable: null, linbits: 0},                                                   // Table  4
-    { hufftable: huffmanTable.slice(41, (41 + 31)), linbits: 0},       // Table  5
-    { hufftable: huffmanTable.slice(72, (72 + 31)), linbits: 0},       // Table  6
-    { hufftable: huffmanTable.slice(103, (103 + 71)), linbits: 0},     // Table  7
-    { hufftable: huffmanTable.slice(174, (174 + 71)), linbits: 0},     // Table  8
-    { hufftable: huffmanTable.slice(245, (245 + 71)), linbits: 0},     // Table  9
-    { hufftable: huffmanTable.slice(316, (316 + 127)), linbits: 0},    // Table  10
-    { hufftable: huffmanTable.slice(443, (443 + 127)), linbits: 0},    // Table  11
-    { hufftable: huffmanTable.slice(570, (570 + 127)), linbits: 0},    // Table  12
-    { hufftable: huffmanTable.slice(697, (697 + 511)), linbits: 0},    // Table  13
-    { hufftable: null, linbits: 0},                                                   // Table  14
-    { hufftable: huffmanTable.slice(1208, (1208 + 511)), linbits: 0},  // Table  15
-    { hufftable: huffmanTable.slice(1719, (1719 + 511)),  linbits: 1}, // Table  16
-    { hufftable: huffmanTable.slice(1719, (1719 + 511)),  linbits: 2}, // Table  17
-    { hufftable: huffmanTable.slice(1719, (1719 + 511)),  linbits: 3}, // Table  18
-    { hufftable: huffmanTable.slice(1719, (1719 + 511)),  linbits: 4}, // Table  19
-    { hufftable: huffmanTable.slice(1719, (1719 + 511)),  linbits: 6}, // Table  20
-    { hufftable: huffmanTable.slice(1719, (1719 + 511)),  linbits: 8}, // Table  21
-    { hufftable: huffmanTable.slice(1719, (1719 + 511)),  linbits: 10},// Table  22
-    { hufftable: huffmanTable.slice(1719, (1719 + 511)),  linbits: 13},// Table  23
-    { hufftable: huffmanTable.slice(2230, (2230 + 512)),  linbits: 4}, // Table  24
-    { hufftable: huffmanTable.slice(2230, (2230 + 512)),  linbits: 5}, // Table  25
-    { hufftable: huffmanTable.slice(2230, (2230 + 512)),  linbits: 6}, // Table  26
-    { hufftable: huffmanTable.slice(2230, (2230 + 512)),  linbits: 7}, // Table  27
-    { hufftable: huffmanTable.slice(2230, (2230 + 512)),  linbits: 8}, // Table  28
-    { hufftable: huffmanTable.slice(2230, (2230 + 512)),  linbits: 9}, // Table  29
-    { hufftable: huffmanTable.slice(2230, (2230 + 512)),  linbits: 11},// Table  30
-    { hufftable: huffmanTable.slice(2230, (2230 + 512)),  linbits: 13},// Table  31
-    { hufftable: huffmanTable.slice(2742, (2742 + 31)),  linbits: 0},  // Table  32
-    { hufftable: huffmanTable.slice(2773, (2773 + 31)),  linbits: 0},  // Table  33
+    { hufftable: null, linbits: 0},                                       // Table  0
+    { hufftable: huffmanTable.subarray(0, 7), linbits: 0},                // Table  1
+    { hufftable: huffmanTable.subarray(7, (7 + 17)), linbits: 0},         // Table  2
+    { hufftable: huffmanTable.subarray(24, (24 + 17)), linbits: 0},       // Table  3
+    { hufftable: null, linbits: 0},                                       // Table  4
+    { hufftable: huffmanTable.subarray(41, (41 + 31)), linbits: 0},       // Table  5
+    { hufftable: huffmanTable.subarray(72, (72 + 31)), linbits: 0},       // Table  6
+    { hufftable: huffmanTable.subarray(103, (103 + 71)), linbits: 0},     // Table  7
+    { hufftable: huffmanTable.subarray(174, (174 + 71)), linbits: 0},     // Table  8
+    { hufftable: huffmanTable.subarray(245, (245 + 71)), linbits: 0},     // Table  9
+    { hufftable: huffmanTable.subarray(316, (316 + 127)), linbits: 0},    // Table  10
+    { hufftable: huffmanTable.subarray(443, (443 + 127)), linbits: 0},    // Table  11
+    { hufftable: huffmanTable.subarray(570, (570 + 127)), linbits: 0},    // Table  12
+    { hufftable: huffmanTable.subarray(697, (697 + 511)), linbits: 0},    // Table  13
+    { hufftable: null, linbits: 0},                                       // Table  14
+    { hufftable: huffmanTable.subarray(1208, (1208 + 511)), linbits: 0},  // Table  15
+    { hufftable: huffmanTable.subarray(1719, (1719 + 511)),  linbits: 1}, // Table  16
+    { hufftable: huffmanTable.subarray(1719, (1719 + 511)),  linbits: 2}, // Table  17
+    { hufftable: huffmanTable.subarray(1719, (1719 + 511)),  linbits: 3}, // Table  18
+    { hufftable: huffmanTable.subarray(1719, (1719 + 511)),  linbits: 4}, // Table  19
+    { hufftable: huffmanTable.subarray(1719, (1719 + 511)),  linbits: 6}, // Table  20
+    { hufftable: huffmanTable.subarray(1719, (1719 + 511)),  linbits: 8}, // Table  21
+    { hufftable: huffmanTable.subarray(1719, (1719 + 511)),  linbits: 10},// Table  22
+    { hufftable: huffmanTable.subarray(1719, (1719 + 511)),  linbits: 13},// Table  23
+    { hufftable: huffmanTable.subarray(2230, (2230 + 512)),  linbits: 4}, // Table  24
+    { hufftable: huffmanTable.subarray(2230, (2230 + 512)),  linbits: 5}, // Table  25
+    { hufftable: huffmanTable.subarray(2230, (2230 + 512)),  linbits: 6}, // Table  26
+    { hufftable: huffmanTable.subarray(2230, (2230 + 512)),  linbits: 7}, // Table  27
+    { hufftable: huffmanTable.subarray(2230, (2230 + 512)),  linbits: 8}, // Table  28
+    { hufftable: huffmanTable.subarray(2230, (2230 + 512)),  linbits: 9}, // Table  29
+    { hufftable: huffmanTable.subarray(2230, (2230 + 512)),  linbits: 11},// Table  30
+    { hufftable: huffmanTable.subarray(2230, (2230 + 512)),  linbits: 13},// Table  31
+    { hufftable: huffmanTable.subarray(2742, (2742 + 31)),  linbits: 0},  // Table  32
+    { hufftable: huffmanTable.subarray(2773, (2773 + 31)),  linbits: 0},  // Table  33
 ];
 
 // m -> bits

@@ -14,14 +14,14 @@ for (var i = 0; i < powtab34.length; i++) {
     powtab34[i] = Math.pow(i, 4.0 / 3.0);
 }
 
-var synthNWin = new Float32Array(64);
+var synthNWin = [];
 for (var i = 0; i < 64; i++) {
-    synthNWin[i] = new Float32Array(32);
+    synthNWin.push(new Float32Array(32));
 }
 
 for (var i = 0; i < 64; i++) {
     for (var j = 0; j < 32; j++) {
-        synthNWin[i][j] = Math.cos(((16+i)*(2*j+1)) * (Math.Pi / 64.0));
+        synthNWin[i][j] = Math.cos(((16+i)*(2*j+1)) * (Math.PI / 64.0));
     }
 }
 
@@ -164,6 +164,8 @@ var ca = new Float32Array([
   -0.514496, -0.471732, -0.313377, -0.181913, -0.094574, -0.040966, -0.014199, -0.003700
 ]);
 
+var isRatios = [0.000000, 0.267949, 0.577350, 1.000000, 1.732051, 3.732051];
+
 var Frame = {
     createNew: function (header, sideInfo, mainData, mainDataBits) {
         var frame = {
@@ -193,7 +195,7 @@ var Frame = {
          * @constructor
          */
         frame.decode = function () {
-            var out = new ArrayBuffer(consts.BytesPerFrame);
+            var out = new Uint8Array(consts.BytesPerFrame);
             var nch = frame.header.numberOfChannels();
             for (var gr = 0; gr < 2; gr++) {
                 for (var ch = 0; ch < nch; ch++) {
@@ -205,9 +207,10 @@ var Frame = {
                     frame.antialias(gr, ch);
                     frame.hybridSynthesis(gr, ch);
                     frame.frequencyInversion(gr, ch);
-                    out = frame.subbandSynthesis(gr, ch, new Uint8Array(out, consts.SamplesPerGr * 4 * gr));
+                    frame.subbandSynthesis(gr, ch, out.subarray(consts.SamplesPerGr * 4 * gr));
                 }
             }
+            // console.log("out: " + out);
             return out;
         };
 
@@ -252,10 +255,10 @@ var Frame = {
                 for (var i = 0; i < 18; i++) {
                     inData[i] = frame.mainData.Is[gr][ch][sb*18+i];
                 }
-                console.log('inData: ' + inData);
-                console.log('----------');
+                // console.log('inData: ' + inData);
+                // console.log('----------');
                 var rawout = Imdct.Win(inData, bt);
-                console.log('rawout: ' + rawout);
+                // console.log('rawout: ' + rawout);
                 // Overlapp add with stored vector into main_data vector
                 for (var i = 0; i < 18; i++) {
                     frame.mainData.Is[gr][ch][sb*18+i] = rawout[i] + frame.store[ch][sb][i];
@@ -329,6 +332,60 @@ var Frame = {
                         if (consts.SfBandIndicesSet[sfreq].L[sfb] >= frame.sideInfo.Count1[gr][1]) {
                             frame.stereoProcessIntensityLong(gr, sfb);
                         }
+                    }
+                }
+            }
+        };
+
+        frame.stereoProcessIntensityLong = function (gr, sfb) {
+            var is_ratio_l = 0.0;
+            var is_ratio_r = 0.0;
+            // Check that((is_pos[sfb]=scalefac) < 7) => no intensity stereo
+            var is_pos = frame.mainData.ScalefacL[gr][0][sfb];
+            if (is_pos < 7) {
+                var sfreq = frame.header.samplingFrequency().value; // Setup sampling freq index
+                var sfb_start = consts.SfBandIndicesSet[sfreq].L[sfb];
+                var sfb_stop = consts.SfBandIndicesSet[sfreq].L[sfb+1];
+                if (is_pos === 6) { // tan((6*PI)/12 = PI/2) needs special treatment!
+                    is_ratio_l = 1.0;
+                    is_ratio_r = 0.0;
+                } else {
+                    is_ratio_l = isRatios[is_pos] / (1.0 + isRatios[is_pos]);
+                    is_ratio_r = 1.0 / (1.0 + isRatios[is_pos]);
+                }
+                // Now decode all samples in this scale factor band
+                for (var i = sfb_start; i < sfb_stop; i++) {
+                    frame.mainData.Is[gr][0][i] *= is_ratio_l;
+                    frame.mainData.Is[gr][1][i] *= is_ratio_r;
+                }
+            }
+        };
+
+        frame.stereoProcessIntensityShort = function (gr, sfb) {
+            var is_ratio_l = 0.0;
+            var is_ratio_r = 0.0;
+            var sfreq = frame.header.samplingFrequency().value; // Setup sampling freq index
+            // The window length
+            var win_len = consts.SfBandIndicesSet[sfreq].S[sfb+1] - consts.SfBandIndicesSet[sfreq].S[sfb];
+            // The three windows within the band has different scalefactors
+            for (var win = 0; win < 3; win++) {
+                // Check that((is_pos[sfb]=scalefac) < 7) => no intensity stereo
+                var is_pos = frame.mainData.ScalefacS[gr][0][sfb][win];
+                if (is_pos < 7) {
+                    var sfb_start = consts.SfBandIndicesSet[sfreq].S[sfb]*3 + win_len*win;
+                    var sfb_stop = sfb_start + win_len;
+                    if (is_pos === 6) { // tan((6*PI)/12 = PI/2) needs special treatment!
+                        is_ratio_l = 1.0;
+                        is_ratio_r = 0.0;
+                    } else {
+                        is_ratio_l = isRatios[is_pos] / (1.0 + isRatios[is_pos]);
+                        is_ratio_r = 1.0 / (1.0 + isRatios[is_pos]);
+                    }
+                    // Now decode all samples in this scale factor band
+                    for (var i = sfb_start; i < sfb_stop; i++) {
+                        // https://github.com/technosaurus/PDMP3/issues/3
+                        frame.mainData.Is[gr][0][i] *= is_ratio_l;
+                        frame.mainData.Is[gr][1][i] *= is_ratio_r;
                     }
                 }
             }
@@ -467,9 +524,10 @@ var Frame = {
                     if (i === next_sfb) {
                         // Copy reordered data back to the original vector
                         var j = 3 * consts.SfBandIndicesSet[sfreq].S[sfb];
-                        for (var s = 0; s < 3*win_len; s++) {
-                            frame.mainData.Is[gr][ch][j + s] = re[s]; // copy(frame.mainData.Is[gr][ch][j:j+3*win_len], re[0:3*win_len])
-                        }
+                        frame.mainData.Is[gr][ch].set(re.slice(0, 3*win_len), j);// copy(frame.mainData.Is[gr][ch][j:j+3*win_len], re[0:3*win_len])
+                        // for (var s = 0; s < 3*win_len; s++) {
+                        //     frame.mainData.Is[gr][ch][j + s] = re[s]; // copy(frame.mainData.Is[gr][ch][j:j+3*win_len], re[0:3*win_len])
+                        // }
                         // Check if this band is above the rzero region,if so we're done
                         if (i >= frame.sideInfo.Count1[gr][ch]) {
                             return;
@@ -487,9 +545,10 @@ var Frame = {
                 }
                 // Copy reordered data of last band back to original vector
                 var j = 3 * consts.SfBandIndicesSet[sfreq].S[12];
-                for (var s = 0; s < 3*win_len; s++) {
-                    frame.mainData.Is[gr][ch][j + s] = re[s]; // copy(frame.mainData.Is[gr][ch][j:j+3*win_len], re[0:3*win_len])
-                }
+                frame.mainData.Is[gr][ch].set(re.slice(0, 3*win_len), j);// copy(frame.mainData.Is[gr][ch][j:j+3*win_len], re[0:3*win_len])
+                // for (var s = 0; s < 3*win_len; s++) {
+                //     frame.mainData.Is[gr][ch][j + s] = re[s]; // copy(frame.mainData.Is[gr][ch][j:j+3*win_len], re[0:3*win_len])
+                // }
             }
         };
 
@@ -500,9 +559,11 @@ var Frame = {
             var nch = frame.header.numberOfChannels();
             // Setup the n_win windowing vector and the v_vec intermediate vector
             for (var ss = 0; ss < 18; ss++) { // Loop through 18 samples in 32 subbands
-                for (var s = 0; s < 1024 - 64; s++) {
-                    frame.v_vec[ch][64+s] = frame.v_vec[ch][s]; // copy(f.v_vec[ch][64:1024], f.v_vec[ch][0:1024-64])
-                }
+                frame.v_vec[ch].set(frame.v_vec[ch].slice(0, 1024-64), 64); // copy(f.v_vec[ch][64:1024], f.v_vec[ch][0:1024-64])
+                // for (var s = 0; s < 1024 - 64;) {
+                //     frame.v_vec[ch][64+s] = frame.v_vec[ch][s]; // copy(f.v_vec[ch][64:1024], f.v_vec[ch][0:1024-64])
+                //     s++;
+                // }
 
                 var d = frame.mainData.Is[gr][ch];
                 for ( var i = 0; i < 32; i++) { // Copy next 32 time samples to a temp vector
@@ -517,12 +578,14 @@ var Frame = {
                 }
                 var v = frame.v_vec[ch];
                 for (var i = 0; i < 512; i += 64) { // Build the U vector
-                    for (var s = 0; s < 32; s++) {  // copy(u_vec[i:i+32], v[(i<<1):(i<<1)+32])
-                        u_vec[i+s] = v[(i<<1) + s];
-                    }
-                    for (var s = 0; s < 32; s++) {  // copy(u_vec[i+32:i+64], v[(i<<1)+96:(i<<1)+128])
-                        u_vec[i+32+s] = v[(i<<1)+96+s];
-                    }
+                    u_vec.set(v.slice((i<<1) >>> 0, ((i<<1) >>> 0)+32), i); // copy(u_vec[i:i+32], v[(i<<1):(i<<1)+32])
+                    u_vec.set(v.slice(((i<<1) >>> 0) + 96, ((i<<1) >>> 0)+128), i+32); // copy(u_vec[i+32:i+64], v[(i<<1)+96:(i<<1)+128])
+                    // for (var s = 0; s < 32; s++) {  // copy(u_vec[i:i+32], v[(i<<1):(i<<1)+32])
+                    //     u_vec[i+s] = v[(i<<1) + s];
+                    // }
+                    // for (var s = 0; s < 32; s++) {  // copy(u_vec[i+32:i+64], v[(i<<1)+96:(i<<1)+128])
+                    //     u_vec[i+32+s] = v[(i<<1)+96+s];
+                    // }
                 }
                 for (var i = 0; i < 512; i++) { // Window by u_vec[i] with synthDtbl[i]
                     u_vec[i] *= synthDtbl[i];
@@ -558,7 +621,7 @@ var Frame = {
                     }
                 }
             }
-            return out.buffer;
+            return out;
         };
 
         frame.samplingFrequency = function () {
@@ -638,7 +701,7 @@ var Frame = {
         // Get main data (scalefactors and Huffman coded frequency data)
         var prevM = null;
         if (prev) {
-            prevM = prev;
+            prevM = prev.mainDataBits;
         }
 
         result = Maindata.read(source, prevM, fh, si);

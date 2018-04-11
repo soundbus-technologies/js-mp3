@@ -111,15 +111,10 @@ var Sideinfo = {
         for (var gr = 0; gr < 2; gr++) {
             for (var ch = 0; ch < nch; ch++) {
                 si.Part2_3Length[gr][ch] = s.Bits(12);
-                console.log('si.Part2_3Length: ' + si.Part2_3Length);
                 si.BigValues[gr][ch] = s.Bits(9);
-                console.log('si.BigValues: ' + si.BigValues);
                 si.GlobalGain[gr][ch] = s.Bits(8);
-                console.log('si.GlobalGain: ' + si.GlobalGain);
                 si.ScalefacCompress[gr][ch] = s.Bits(4);
-                console.log('si.ScalefacCompress: ' + si.ScalefacCompress);
                 si.WinSwitchFlag[gr][ch] = s.Bits(1);
-                console.log('si.WinSwitchFlag: ' + si.WinSwitchFlag);
                 if (si.WinSwitchFlag[gr][ch] === 1) {
                     si.BlockType[gr][ch] = s.Bits(2);
                     si.MixedBlockFlag[gr][ch] = s.Bits(1);
@@ -143,21 +138,13 @@ var Sideinfo = {
                     for (var region = 0; region < 3; region++) {
                         si.TableSelect[gr][ch][region] = s.Bits(5);
                     }
-                    console.log('si.TableSelect: ' + si.TableSelect);
                     si.Region0Count[gr][ch] = s.Bits(4);
-                    console.log('si.Region0Count: ' + si.Region0Count);
                     si.Region1Count[gr][ch] = s.Bits(3);
-                    console.log('si.Region1Count: ' + si.Region1Count);
                     si.BlockType[gr][ch] = 0; // Implicit
-                    console.log('si.BlockType: ' + si.BlockType);
                 }
                 si.Preflag[gr][ch] = s.Bits(1);
-                console.log('si.Preflag: ' + si.Preflag);
                 si.ScalefacScale[gr][ch] = s.Bits(1);
-                console.log('si.ScalefacScale: ' + si.ScalefacScale);
                 si.Count1TableSelect[gr][ch] = s.Bits(1);
-                console.log('si.Count1TableSelect: ' + si.Count1TableSelect);
-                console.log('--------------');
             }
         }
         return {

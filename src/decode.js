@@ -18,11 +18,17 @@ var Mp3 = {
          *
          * @param position
          * @param whence
-         * @returns {number}
          */
-        source.seek = function (position, whence) {
+        source.seek = function (position) {
+            if (position < 0 || position > source.buf.byteLength) {
+                return {
+                    err: "position not correct"
+                }
+            }
             source.pos = position;
-            return source.pos;
+            return {
+                pos: source.pos
+            };
         };
 
         source.readFull = function (length) {
@@ -119,6 +125,7 @@ var Mp3 = {
                     source.unread(buf);
                     break;
             }
+            return {};
         };
 
         source.unread = function (buf) {
@@ -147,7 +154,7 @@ var Mp3 = {
 
         // ======= Methods of decoder :: start =========
         decoder.readFrame = function () {
-            var result = Frame.read(decoder.source, decoder.source.pos);
+            var result = Frame.read(decoder.source, decoder.source.pos, decoder.frame);
             if (result.err) {
                 return {
                     err: result.err
@@ -156,6 +163,7 @@ var Mp3 = {
             decoder.frame = result.f;
             var pcm_buf = decoder.frame.decode();
             decoder.buf = util.concatBuffers(decoder.buf, pcm_buf);
+            // console.log('decoder.buf: ' + new Uint8Array(decoder.buf));
             return {};
         };
 
@@ -175,11 +183,20 @@ var Mp3 = {
                 return {}
             }
 
+            var pos = decoder.source.pos;
+
             decoder.source.rewind();
+
+            var r = decoder.source.skipTags();
+            if (r.err) {
+                return {
+                    err: r.err
+                }
+            }
 
             var l = 0;
             while(true) {
-                var result = Frameheader.read(decoder.source, decoder.source.getPos());
+                var result = Frameheader.read(decoder.source, decoder.source.pos);
                 if (result.err) {
                     if (result.err.toString().indexOf("UnexpectedEOF") > -1) {
                         break;
@@ -190,14 +207,18 @@ var Mp3 = {
                 }
                 decoder.frameStarts.push(result.position);
                 l += consts.BytesPerFrame;
-                result = decoder.source.readFull(result.h.frameSize() - 4);
+
+                result = decoder.source.readFull(result.h.frameSize() - 4); // move to next frame position
                 if (result.err) {
                     break;
                 }
             }
             decoder.length = l;
 
-            decoder.source.rewind();
+            var result = decoder.source.seek(pos); // reset to beginning position
+            if (result.err) {
+                return resu
+            }
 
             return {};
         };

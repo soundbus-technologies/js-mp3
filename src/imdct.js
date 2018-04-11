@@ -1,4 +1,7 @@
+var util = require('./util');
+
 var imdctWinData = [new Float32Array(36), new Float32Array(36), new Float32Array(36), new Float32Array(36)];
+
 var cosN12 = [];
 for (var i = 0; i < 6; i++) {
     cosN12.push(new Float32Array(12));
@@ -41,7 +44,7 @@ var init = function () {
         imdctWinData[3][i] = 1.0;
     }
     for (var i = 18; i < 36; i++) {
-        imdctWinData[3][i] = Math.sin(Math.Pi / 36 * (i + 0.5));
+        imdctWinData[3][i] = Math.sin(Math.PI / 36 * (i + 0.5));
     }
 
     const cosN12_N = 12

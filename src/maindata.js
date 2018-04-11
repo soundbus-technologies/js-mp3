@@ -33,21 +33,21 @@ var MainData = {
             }
         }
         // Sideinfo is 17 bytes for one channel and 32 bytes for two
-        var sideinfo_size = 32
+        var sideinfo_size = 32;
         if (nch === 1) {
-            sideinfo_size = 17
+            sideinfo_size = 17;
         }
         // Main data size is the rest of the frame,including ancillary data
         var main_data_size = framesize - sideinfo_size - 4; // sync+header
         // CRC is 2 bytes
         if (fh.protectionBit() === 0) {
-            main_data_size -= 2
+            main_data_size -= 2;
         }
         // Assemble main data buffer with data from this frame and the previous
         // two frames. main_data_begin indicates how many bytes from previous
         // frames that should be used. This buffer is later accessed by the
         // Bits function in the same way as the side info is.
-        var result = read(source, prev, main_data_size, si.MainDataBegin)
+        var result = read(source, prev, main_data_size, si.MainDataBegin); // read bits for maindata
         if (result.err) {
             return {
                 v: null,
@@ -56,18 +56,18 @@ var MainData = {
             }
         }
 
+        var b = result.b;
         var md = MainData.createNew();
-        var m = result.m;
         for (var gr = 0; gr < 2; gr++) {
             for (var ch = 0; ch < nch; ch++) {
-                var part_2_start = m.BitPos();
+                var part_2_start = b.BitPos();
                 // Number of bits in the bitstream for the bands
                 var slen1 = scalefacSizes[si.ScalefacCompress[gr][ch]][0];
                 var slen2 = scalefacSizes[si.ScalefacCompress[gr][ch]][1];
                 if (si.WinSwitchFlag[gr][ch] === 1 && si.BlockType[gr][ch] === 2) {
                     if (si.MixedBlockFlag[gr][ch] !== 0) {
                         for (var sfb = 0; sfb < 8; sfb++) {
-                            md.ScalefacL[gr][ch][sfb] = m.Bits(slen1)
+                            md.ScalefacL[gr][ch][sfb] = b.Bits(slen1)
                         }
                         for (var sfb = 3; sfb < 12; sfb++) {
                             //slen1 for band 3-5,slen2 for 6-11
@@ -76,7 +76,7 @@ var MainData = {
                                 nbits = slen1;
                             }
                             for (var win = 0; win < 3; win++) {
-                                md.ScalefacS[gr][ch][sfb][win] = m.Bits(nbits);
+                                md.ScalefacS[gr][ch][sfb][win] = b.Bits(nbits);
                             }
                         }
                     } else {
@@ -87,7 +87,7 @@ var MainData = {
                                 nbits = slen1;
                             }
                             for (var win = 0; win < 3; win++) {
-                                md.ScalefacS[gr][ch][sfb][win] = m.Bits(nbits);
+                                md.ScalefacS[gr][ch][sfb][win] = b.Bits(nbits);
                             }
                         }
                     }
@@ -95,7 +95,7 @@ var MainData = {
                     // Scale factor bands 0-5
                     if (si.Scfsi[ch][0] === 0 || gr === 0) {
                         for (var sfb = 0; sfb < 6; sfb++) {
-                            md.ScalefacL[gr][ch][sfb] = m.Bits(slen1);
+                            md.ScalefacL[gr][ch][sfb] = b.Bits(slen1);
                         }
                     } else if (si.Scfsi[ch][0] === 1 && gr === 1) {
                         // Copy scalefactors from granule 0 to granule 1
@@ -107,7 +107,7 @@ var MainData = {
                     // Scale factor bands 6-10
                     if (si.Scfsi[ch][1] === 0 || gr === 0) {
                         for (var sfb = 6; sfb < 11; sfb++) {
-                            md.ScalefacL[gr][ch][sfb] = m.Bits(slen1);
+                            md.ScalefacL[gr][ch][sfb] = b.Bits(slen1);
                         }
                     } else if (si.Scfsi[ch][1] === 1 && gr === 1) {
                         // Copy scalefactors from granule 0 to granule 1
@@ -118,7 +118,7 @@ var MainData = {
                     // Scale factor bands 11-15
                     if (si.Scfsi[ch][2] === 0 || gr === 0) {
                         for (var sfb = 11; sfb < 16; sfb++) {
-                            md.ScalefacL[gr][ch][sfb] = m.Bits(slen2);
+                            md.ScalefacL[gr][ch][sfb] = b.Bits(slen2);
                         }
                     } else if (si.Scfsi[ch][2] === 1 && gr === 1) {
                         // Copy scalefactors from granule 0 to granule 1
@@ -129,7 +129,7 @@ var MainData = {
                     // Scale factor bands 16-20
                     if (si.Scfsi[ch][3] === 0 || gr === 0) {
                         for (var sfb = 16; sfb < 21; sfb++) {
-                            md.ScalefacL[gr][ch][sfb] = m.Bits(slen2);
+                            md.ScalefacL[gr][ch][sfb] = b.Bits(slen2);
                         }
                     } else if (si.Scfsi[ch][3] === 1 && gr === 1) {
                         // Copy scalefactors from granule 0 to granule 1
@@ -138,7 +138,7 @@ var MainData = {
                         }
                     }
                 }
-                var err = readHuffman(m, fh, si, md, part_2_start, gr, ch);
+                var err = readHuffman(b, fh, si, md, part_2_start, gr, ch);
                 if (err) {
                     return {
                         v: null,
@@ -150,7 +150,7 @@ var MainData = {
         }
         return {
             v: md,
-            bits: m,
+            bits: b,
             err: null
         }
     }
@@ -159,7 +159,7 @@ var MainData = {
 var read = function (source, prev, size, offset) {
     if (size > 1500) {
         return {
-            m: null,
+            b: null,
             err: "mp3: size = " + size
         }
     }
@@ -171,7 +171,7 @@ var read = function (source, prev, size, offset) {
         var buf = new Uint8Array(source, 0, size);
         if (buf.byteLength < size) {
             return {
-                m: null,
+                b: null,
                 err: "maindata.Read (1)"
             }
         }
@@ -197,12 +197,12 @@ var read = function (source, prev, size, offset) {
     // var buf = new Uint8Array(source, 0, size);
     if (buf.byteLength < size) {
         return {
-            m: null,
+            b: null,
             err: "maindata.Read (2)"
         }
     }
     return {
-        m: bits.createNew(util.concatBuffers(vec, new Uint8Array(buf.slice()).buffer)),
+        b: bits.createNew(util.concatBuffers(vec, new Uint8Array(buf.slice()).buffer)),
         err: null
     }
 };
@@ -255,11 +255,11 @@ var readHuffman = function (m, header, sideInfo, mainData, part_2_start, gr, ch)
             table_num = sideInfo.TableSelect[gr][ch][2];
         }
         // Get next Huffman coded words
-        console.log('is_pos: ' + is_pos)
-        console.log('table_num: ' + table_num)
+        // console.log('is_pos: ' + is_pos)
+        // console.log('table_num: ' + table_num)
         var result = huffman.decode(m, table_num);
-        console.log('x: ' + result.x + ', y: ' + result.y);
-        console.log('------');
+        // console.log('x: ' + result.x + ', y: ' + result.y);
+        // console.log('------');
         if (result.err) {
             return err;
         }

@@ -15,6 +15,7 @@ var pcmArrayBuffer = decoder.decode(); // now you got decoded PCM data
 
 ### Tests
 #### Frameworks
+- `rewire`: https://github.com/jhnns/rewire
 - `Mocha`: https://mochajs.org/
 - `Chai`: https://github.com/chaijs/chai
 - `Istanbul`: https://github.com/gotwarlost/istanbul
