@@ -10,16 +10,12 @@ describe('frame', function() {
             var f = Frame.createNew();
             should.exist(f, 'frame should exist.');
             f.should.be.an('object');
-            f.store.length.should.equal(18);
 
             f.store[0].should.be.an('array');
-            f.store[0].length.should.equal(32);
 
-            f.store[0][0].length.should.equal(2);
-            f.store[0][0].toString().should.equal('0,0');
+            f.store[0][0].toString().should.equal('0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0');
 
             f.v_vec.should.be.an('array');
-            f.v_vec[0].length.should.equal(2);
         });
     });
 

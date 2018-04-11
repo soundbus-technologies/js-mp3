@@ -56,14 +56,6 @@ var Mp3 = {
         };
 
         source.skipTags = function () {
-            // TODO DELETE comment
-            // var buf;
-            // if (source.buf.length < 3) {
-            //     buf = new Uint8Array(source.buf);
-            // } else {
-            //     buf = new Uint8Array(source.buf, 0, 3);
-            // }
-
             var result = source.readFull(3);
             if (result.err) {
                 return {
@@ -76,8 +68,6 @@ var Mp3 = {
             var t = String.fromCharCode.apply(null, buf);
             switch (t) {
                 case "TAG":
-                    // TODO DELETE comment
-                    // buf = new Uint8Array(source.buf, 3, Math.min(125, source.buf.byteLength));
                     result = source.readFull(125);
                     if (result.err) {
                         return {
@@ -87,7 +77,6 @@ var Mp3 = {
                     buf = result.buf;
                     break;
                 case 'ID3':
-                    // TODO DELETE comment
                     // Skip version (2 bytes) and flag (1 byte)
                     result = source.readFull(3);
                     if (result.err) {
@@ -103,8 +92,6 @@ var Mp3 = {
                         }
                     }
                     buf = result.buf;
-                    // TODO DELETE comment
-                    // buf = new Uint8Array(source.buf, 6, Math.min(4, source.buf.byteLength));
                     if (buf.byteLength !== 4) {
                         return {
                             err: "data not enough."
@@ -118,8 +105,6 @@ var Mp3 = {
                         }
                     }
                     buf = result.buf;
-                    // TODO DELETE comment
-                    // buf = new Uint8Array(source.buf, 6 + buf.byteLength, Math.min(size, source.buf.byteLength));
                     break;
                 default:
                     source.unread(buf);
@@ -162,9 +147,7 @@ var Mp3 = {
             }
             decoder.frame = result.f;
             var pcm_buf = decoder.frame.decode();
-            console.log('pcm_buf: ' + new Uint8Array(pcm_buf));
             decoder.buf = util.concatBuffers(decoder.buf, pcm_buf);
-            // console.log('decoder.buf: ' + new Uint8Array(decoder.buf));
             return {};
         };
 
@@ -218,7 +201,7 @@ var Mp3 = {
 
             var result = decoder.source.seek(pos); // reset to beginning position
             if (result.err) {
-                return resu
+                return result;
             }
 
             return {};

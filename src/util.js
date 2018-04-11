@@ -103,18 +103,6 @@ module.exports = {
                 result = "0" + result;
             }
             return sign + result;
-        },
-        toUint32: function (v) {
-            return v >>> 0;
-        },
-        toInt32: function (v) {
-            return v >> 0;
-        },
-        toFixed: function(num, s) {
-            var times = Math.pow(10, s)
-            var des = num * times + 0.5
-            des = parseInt(des, 10) / times
-            return des
         }
     }
 };

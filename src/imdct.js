@@ -1,5 +1,3 @@
-var util = require('./util');
-
 var imdctWinData = [new Float32Array(36), new Float32Array(36), new Float32Array(36), new Float32Array(36)];
 
 var cosN12 = [];

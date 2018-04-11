@@ -32,14 +32,13 @@ describe('mp3', function() {
     describe('#newDecoder()', function() {
         it('should return new decoder object.', function() {
             var buf = data.buffer();
-            console.log('buf byteLength: ' + buf.byteLength);
+            console.log('data byteLength: ' + buf.byteLength);
 
             var decoder = Mp3.newDecoder(buf);
             should.exist(decoder, 'decoder should exist.');
             decoder.should.be.an('object');
 
             var pcm_buffer = decoder.decode();
-            console.log(new Uint8Array(pcm_buffer));
             console.log('pcm_buffer byteLength: ' + pcm_buffer.byteLength);
         });
     });

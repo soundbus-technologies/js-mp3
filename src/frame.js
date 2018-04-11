@@ -254,10 +254,7 @@ var Frame = {
                 for (var i = 0; i < 18; i++) {
                     inData[i] = frame.mainData.Is[gr][ch][sb*18+i];
                 }
-                // console.log('inData: ' + inData);
-                // console.log('----------');
                 var rawout = Imdct.Win(inData, bt);
-                // console.log('rawout: ' + rawout);
                 // Overlapp add with stored vector into main_data vector
                 for (var i = 0; i < 18; i++) {
                     frame.mainData.Is[gr][ch][sb*18+i] = rawout[i] + frame.store[ch][sb][i];
@@ -577,12 +574,6 @@ var Frame = {
                 for (var i = 0; i < 512; i += 64) { // Build the U vector
                     u_vec.set(v.slice((i<<1) >>> 0, ((i<<1) >>> 0)+32), i); // copy(u_vec[i:i+32], v[(i<<1):(i<<1)+32])
                     u_vec.set(v.slice(((i<<1) >>> 0) + 96, ((i<<1) >>> 0)+128), i+32); // copy(u_vec[i+32:i+64], v[(i<<1)+96:(i<<1)+128])
-                    // for (var s = 0; s < 32; s++) {  // copy(u_vec[i:i+32], v[(i<<1):(i<<1)+32])
-                    //     u_vec[i+s] = v[(i<<1) + s];
-                    // }
-                    // for (var s = 0; s < 32; s++) {  // copy(u_vec[i+32:i+64], v[(i<<1)+96:(i<<1)+128])
-                    //     u_vec[i+32+s] = v[(i<<1)+96+s];
-                    // }
                 }
                 for (var i = 0; i < 512; i++) { // Window by u_vec[i] with synthDtbl[i]
                     u_vec[i] *= synthDtbl[i];
