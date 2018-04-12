@@ -210,6 +210,11 @@ var Frame = {
                     frame.subbandSynthesis(gr, ch, out.subarray(consts.SamplesPerGr * 4 * gr));
                 }
             }
+            if (nch === 1) { // extract data for mono
+                out = out.filter(function (element, index, array) {
+                    return (index % 4 === 0 || index % 4 === 1);
+                });
+            }
             return out;
         };
 
@@ -554,10 +559,6 @@ var Frame = {
             // Setup the n_win windowing vector and the v_vec intermediate vector
             for (var ss = 0; ss < 18; ss++) { // Loop through 18 samples in 32 subbands
                 frame.v_vec[ch].set(frame.v_vec[ch].slice(0, 1024-64), 64); // copy(f.v_vec[ch][64:1024], f.v_vec[ch][0:1024-64])
-                // for (var s = 0; s < 1024 - 64;) {
-                //     frame.v_vec[ch][64+s] = frame.v_vec[ch][s]; // copy(f.v_vec[ch][64:1024], f.v_vec[ch][0:1024-64])
-                //     s++;
-                // }
 
                 var d = frame.mainData.Is[gr][ch];
                 for ( var i = 0; i < 32; i++) { // Copy next 32 time samples to a temp vector
@@ -592,14 +593,6 @@ var Frame = {
                     }
                     var s = samp;
                     var idx = 4 * (32*ss + i);
-                    if (nch === 1) {
-                        // We always run in stereo mode and duplicate channels here for mono.
-                        out[idx] = s;
-                        out[idx+1] = (s >>> 8) >>> 0;
-                        out[idx+2] = s;
-                        out[idx+3] = (s >>> 8) >>> 0;
-                        continue;
-                    }
                     if (ch === 0) {
                         out[idx] = s;
                         out[idx+1] = (s >>> 8) >>> 0;
