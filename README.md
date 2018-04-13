@@ -30,3 +30,6 @@ Get coverage report:
 $ npm run coverage 
 ```
 Then you can find the report html here: `{project_location}/coverage/lcov-report/index.html`.
+
+### Issue
+It put all decoded pcm data in ArrayBuffer now, so you'd better not use it to decode big size MP3 file. 
