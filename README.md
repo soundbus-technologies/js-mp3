@@ -1,5 +1,5 @@
 # js-mp3
-Pure javascript mp3 decoder, WIP.  
+Pure javascript mp3 decoder, translate from [go-mp3](https://github.com/hajimehoshi/go-mp3) project.  
 [![Build Status](https://travis-ci.org/soundbus-technologies/js-mp3.svg?branch=master)](https://travis-ci.org/soundbus-technologies/js-mp3)
 
 ### Usage
@@ -12,7 +12,7 @@ var decoder = Mp3.newDecoder(mp3ArrayBuffer);
 var pcmArrayBuffer = decoder.decode(); // now you got decoded PCM data
 
 ```
-you can visit [js-mp3-example](https://gitlab.oifitech.com/web-frontend/js-mp3-example) project to see how to decode mp3 file then play it. 
+you can visit [js-mp3-example](https://github.com/soundbus-technologies/js-mp3-example) project to see how to decode mp3 file then play it. 
 
 ### Tests
 #### Frameworks
